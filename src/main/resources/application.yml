@@ -1,1 +1,23 @@
-spring.application.name=pragmatic-ddd-ecommerce
+spring:
+  application:
+    name: pragmatic-ddd-ecommerce
+
+  datasource:
+    url: jdbc:h2:mem:pragmaticdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update   # create-drop | create | validate | none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
