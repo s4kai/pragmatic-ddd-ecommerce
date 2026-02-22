@@ -1,4 +1,9 @@
 package com.sakai.ecommerce.shared.core;
 
-public class DomainEvent {
+import lombok.Data;
+import java.util.UUID;
+
+@Data
+public class DomainEvent{
+    private final UUID eventId = UUID.randomUUID();
 }
