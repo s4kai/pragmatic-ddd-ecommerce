@@ -5,6 +5,7 @@ import com.sakai.ecommerce.customer.domain.Address;
 import com.sakai.ecommerce.customer.domain.ContactInfo;
 import com.sakai.ecommerce.customer.domain.Customer;
 import com.sakai.ecommerce.customer.domain.CustomerRepository;
+import com.sakai.ecommerce.customer.domain.exceptions.CustomerAlreadyExists;
 import com.sakai.ecommerce.shared.dto.AddressDTO;
 import com.sakai.ecommerce.shared.infra.DomainEventPublisher;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,7 @@ class CreateCustomer {
     @Transactional
     public UUID handle(CustomerDTO dto) {
         customerRepository.findByDocument(dto.getCpf())
-            .ifPresent(customer -> {
-                throw new RuntimeException("Customer already exists");
-            });
+            .ifPresent(CustomerAlreadyExists::new);
 
         var addressDTO = dto.getAddress();
         var newCustomer = getCustomer(dto, addressDTO);
