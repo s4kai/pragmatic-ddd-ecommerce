@@ -1,6 +1,6 @@
 package com.sakai.ecommerce.customer.application;
 
-import com.sakai.ecommerce.customer.application.dto.CustomerDTO;
+import com.sakai.ecommerce.customer.application.commands.CreateCustomerCommand;
 import com.sakai.ecommerce.shared.dto.AddressDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +28,7 @@ class CustomerServiceTest {
     void shouldCreateCustomer() {
         var dto = validCustomerDTO();
         var expectedId = UUID.randomUUID();
-        when(createCustomer.handle(any(CustomerDTO.class))).thenReturn(expectedId);
+        when(createCustomer.handle(any(CreateCustomerCommand.class))).thenReturn(expectedId);
 
         var result = customerService.create(dto);
 
@@ -36,8 +36,8 @@ class CustomerServiceTest {
         verify(createCustomer).handle(dto);
     }
 
-    private CustomerDTO validCustomerDTO() {
-        var dto = new CustomerDTO();
+    private CreateCustomerCommand validCustomerDTO() {
+        var dto = new CreateCustomerCommand();
         dto.setName("João");
         dto.setLastName("Silva");
         dto.setBirthDate(LocalDate.of(1990, 1, 1));

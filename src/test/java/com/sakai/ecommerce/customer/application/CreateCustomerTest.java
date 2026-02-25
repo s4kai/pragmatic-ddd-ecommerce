@@ -1,8 +1,9 @@
 package com.sakai.ecommerce.customer.application;
 
-import com.sakai.ecommerce.customer.application.dto.CustomerDTO;
+import com.sakai.ecommerce.customer.application.commands.CreateCustomerCommand;
 import com.sakai.ecommerce.customer.domain.Customer;
 import com.sakai.ecommerce.customer.domain.CustomerRepository;
+import com.sakai.ecommerce.customer.domain.exceptions.CustomerAlreadyExists;
 import com.sakai.ecommerce.shared.dto.AddressDTO;
 import com.sakai.ecommerce.shared.infra.DomainEventPublisher;
 import org.junit.jupiter.api.Test;
@@ -30,10 +31,10 @@ class CreateCustomerTest {
 
     @Test
     void shouldCreateCustomerSuccessfully() {
-        var dto = validCustomerDTO();
-        when(customerRepository.findByDocument(dto.getCpf())).thenReturn(Optional.empty());
+        var command = validCustomerCommand();
+        when(customerRepository.findByDocument(command.getCpf())).thenReturn(Optional.empty());
 
-        var customerId = createCustomer.handle(dto);
+        var customerId = createCustomer.handle(command);
 
         assertNotNull(customerId);
         verify(customerRepository).save(any(Customer.class));
@@ -42,24 +43,24 @@ class CreateCustomerTest {
 
     @Test
     void shouldThrowExceptionWhenCustomerAlreadyExists() {
-        var dto = validCustomerDTO();
-        when(customerRepository.findByDocument(dto.getCpf())).thenReturn(Optional.of(mock(Customer.class)));
+        var command = validCustomerCommand();
+        when(customerRepository.findByDocument(command.getCpf())).thenReturn(Optional.of(mock(Customer.class)));
 
-        assertThrows(RuntimeException.class, () -> createCustomer.handle(dto));
+        assertThrows(CustomerAlreadyExists.class, () -> createCustomer.handle(command));
         
         verify(customerRepository, never()).save(any());
     }
 
-    private CustomerDTO validCustomerDTO() {
-        var dto = new CustomerDTO();
-        dto.setName("João");
-        dto.setLastName("Silva");
-        dto.setBirthDate(LocalDate.of(1990, 1, 1));
-        dto.setEmail("test@email.com");
-        dto.setPhone("11999999999");
-        dto.setCpf("12345678900");
-        dto.setAddress(validAddressDTO());
-        return dto;
+    private CreateCustomerCommand validCustomerCommand() {
+        var command = new CreateCustomerCommand();
+        command.setName("João");
+        command.setLastName("Silva");
+        command.setBirthDate(LocalDate.of(1990, 1, 1));
+        command.setEmail("test@email.com");
+        command.setPhone("11999999999");
+        command.setCpf("12345678900");
+        command.setAddress(validAddressDTO());
+        return command;
     }
 
     private AddressDTO validAddressDTO() {

@@ -1,6 +1,6 @@
 package com.sakai.ecommerce.customer.application;
 
-import com.sakai.ecommerce.customer.application.dto.CustomerDTO;
+import com.sakai.ecommerce.customer.application.commands.CreateCustomerCommand;
 import com.sakai.ecommerce.customer.domain.Address;
 import com.sakai.ecommerce.customer.domain.ContactInfo;
 import com.sakai.ecommerce.customer.domain.Customer;
@@ -22,12 +22,13 @@ class CreateCustomer {
     private final DomainEventPublisher eventPublisher;
 
     @Transactional
-    public UUID handle(CustomerDTO dto) {
-        customerRepository.findByDocument(dto.getCpf())
-            .ifPresent(CustomerAlreadyExists::new);
+    public UUID handle(CreateCustomerCommand command) {
+        if(customerRepository.findByDocument(command.getCpf()).isPresent()){
+            throw new CustomerAlreadyExists();
+        }
 
-        var addressDTO = dto.getAddress();
-        var newCustomer = getCustomer(dto, addressDTO);
+        var addressDTO = command.getAddress();
+        var newCustomer = getCustomer(command, addressDTO);
 
         customerRepository.save(newCustomer);
         eventPublisher.publish(newCustomer);
@@ -35,7 +36,7 @@ class CreateCustomer {
         return newCustomer.getId();
     }
 
-    private static @NonNull Customer getCustomer(CustomerDTO dto, AddressDTO addressDTO) {
+    private static @NonNull Customer getCustomer(CreateCustomerCommand command, AddressDTO addressDTO) {
         var newAddress = new Address(
                 addressDTO.getStreet(),
                 addressDTO.getNumber(),
@@ -47,11 +48,11 @@ class CreateCustomer {
         );
 
         return new Customer(
-                dto.getCpf(),
-                dto.getName(),
-                dto.getLastName(),
-                dto.getBirthDate(),
-                new ContactInfo(dto.getEmail(), dto.getPhone()),
+                command.getCpf(),
+                command.getName(),
+                command.getLastName(),
+                command.getBirthDate(),
+                new ContactInfo(command.getEmail(), command.getPhone()),
                 newAddress
         );
     }

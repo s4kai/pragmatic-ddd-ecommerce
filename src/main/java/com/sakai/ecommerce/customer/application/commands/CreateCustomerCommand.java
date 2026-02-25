@@ -1,4 +1,4 @@
-package com.sakai.ecommerce.customer.application.dto;
+package com.sakai.ecommerce.customer.application.commands;
 
 import com.sakai.ecommerce.shared.dto.AddressDTO;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class CustomerDTO {
+public class CreateCustomerCommand {
     private String name;
     private String lastName;
     private LocalDate birthDate;

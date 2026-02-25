@@ -1,6 +1,6 @@
 package com.sakai.ecommerce.customer.application;
 
-import com.sakai.ecommerce.customer.application.dto.CustomerDTO;
+import com.sakai.ecommerce.customer.application.commands.CreateCustomerCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.util.UUID;
 public class CustomerService {
     private final CreateCustomer createCustomer;
 
-    public UUID create(CustomerDTO customerDTO) {
-        return createCustomer.handle(customerDTO);
+    public UUID create(CreateCustomerCommand command) {
+        return createCustomer.handle(command);
     }
 }

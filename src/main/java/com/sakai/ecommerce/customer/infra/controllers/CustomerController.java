@@ -19,8 +19,8 @@ public class CustomerController {
     private final CreateCustomerRequestMapper createCustomerRequestMapper;
 
     @PostMapping
-    public ResponseEntity<UUID> create(@RequestBody @Valid CreateCustomerRequest dto) {
-        var customerDTO = createCustomerRequestMapper.toDTO(dto);
+    public ResponseEntity<UUID> create(@RequestBody @Valid CreateCustomerRequest command) {
+        var customerDTO = createCustomerRequestMapper.toCommand(command);
         var createdCustomerId = customerService.create(customerDTO);
 
         return ResponseEntity

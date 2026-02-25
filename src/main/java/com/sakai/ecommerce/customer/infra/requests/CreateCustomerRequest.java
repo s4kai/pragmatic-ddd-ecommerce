@@ -1,6 +1,5 @@
 package com.sakai.ecommerce.customer.infra.requests;
 
-import com.sakai.ecommerce.customer.application.dto.CustomerDTO;
 import com.sakai.ecommerce.shared.dto.AddressDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

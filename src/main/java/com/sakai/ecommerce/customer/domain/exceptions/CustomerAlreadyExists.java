@@ -1,8 +1,7 @@
 package com.sakai.ecommerce.customer.domain.exceptions;
-import com.sakai.ecommerce.customer.domain.Customer;
 
 public class CustomerAlreadyExists extends RuntimeException{
-    public  CustomerAlreadyExists(Customer customer){
+    public  CustomerAlreadyExists(){
         super("Customer already exists");
     }
 }
