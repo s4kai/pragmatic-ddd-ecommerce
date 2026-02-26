@@ -1,4 +1,4 @@
-package com.sakai.ecommerce.shared.dto;
+package com.sakai.ecommerce.shared.application.dto;
 
 import lombok.Data;
 
