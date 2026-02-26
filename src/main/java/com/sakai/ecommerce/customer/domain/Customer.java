@@ -1,7 +1,7 @@
 package com.sakai.ecommerce.customer.domain;
 
 import com.sakai.ecommerce.customer.domain.events.CreatedCustomerEvent;
-import com.sakai.ecommerce.shared.core.AggregateRoot;
+import com.sakai.ecommerce.shared.domain.core.AggregateRoot;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.sakai.ecommerce.customer.application;
 
 import com.sakai.ecommerce.customer.application.commands.CreateCustomerCommand;
-import com.sakai.ecommerce.shared.dto.AddressDTO;
+import com.sakai.ecommerce.shared.application.dto.AddressDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

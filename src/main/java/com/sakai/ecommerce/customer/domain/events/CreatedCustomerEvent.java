@@ -1,8 +1,7 @@
 package com.sakai.ecommerce.customer.domain.events;
 
-import com.sakai.ecommerce.shared.core.DomainEvent;
+import com.sakai.ecommerce.shared.domain.core.DomainEvent;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import java.util.UUID;
 

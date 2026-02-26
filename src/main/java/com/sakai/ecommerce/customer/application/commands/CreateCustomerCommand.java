@@ -1,6 +1,6 @@
 package com.sakai.ecommerce.customer.application.commands;
 
-import com.sakai.ecommerce.shared.dto.AddressDTO;
+import com.sakai.ecommerce.shared.application.dto.AddressDTO;
 import lombok.Data;
 
 import java.time.LocalDate;
