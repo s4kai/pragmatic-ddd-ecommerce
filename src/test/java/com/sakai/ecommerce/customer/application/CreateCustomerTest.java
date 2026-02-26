@@ -24,8 +24,10 @@ class CreateCustomerTest {
 
     @Mock
     private CustomerRepository customerRepository;
+
     @Mock
     private EventPublisher eventPublisher;
+
     @InjectMocks
     private CreateCustomer createCustomer;
 
