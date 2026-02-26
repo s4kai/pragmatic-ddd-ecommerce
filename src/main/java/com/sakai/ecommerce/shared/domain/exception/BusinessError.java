@@ -1,4 +1,4 @@
-package com.sakai.ecommerce.shared.exception;
+package com.sakai.ecommerce.shared.domain.exception;
 
 public class BusinessError extends DomainError {
     public BusinessError(String message) {

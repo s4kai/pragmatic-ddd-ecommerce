@@ -1,4 +1,4 @@
-package com.sakai.ecommerce.shared.exception;
+package com.sakai.ecommerce.shared.domain.exception;
 
 public class DomainError extends RuntimeException{
     public DomainError(String message) {
