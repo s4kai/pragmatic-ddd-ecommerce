@@ -64,4 +64,36 @@ public class Product extends AggregateRoot<UUID> {
 
         this.productVariants.add(newVariant);
     }
+
+    public void updateName(String name) {
+        if (name == null || name.isBlank()) throw new BusinessError("Product name cannot be null or blank");
+        this.name = name;
+    }
+
+    public void updateDescription(String description) {
+        if (description == null || description.isBlank())
+            throw new BusinessError("Product description cannot be null or blank");
+
+        this.description = description;
+    }
+
+    public ProductVariant findVariantBySKU(SKU sku) {
+        return productVariants.stream()
+                .filter(v -> v.hasSameSKU(sku))
+                .findFirst()
+                .orElseThrow(() -> new BusinessError("Variant not found: " + sku.getValue()));
+    }
+
+    public void validateUniqueSKUs(List<SKU> skus) {
+        var hasDuplicates = skus.size() != skus.stream().distinct().count();
+        if (hasDuplicates) {
+            throw new BusinessError("Duplicate SKUs found in variants");
+        }
+    }
+
+    public List<String> getVariantFiles() {
+        return productVariants.stream()
+                .flatMap(v -> v.getFiles().stream())
+                .toList();
+    }
 }
