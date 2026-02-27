@@ -4,8 +4,8 @@ import com.sakai.ecommerce.catalog.application.commands.CreateProductWithVariant
 import com.sakai.ecommerce.catalog.application.commands.CreateVariantCommand;
 import com.sakai.ecommerce.catalog.application.dto.ProductDimensionsDTO;
 import com.sakai.ecommerce.catalog.domain.*;
+import com.sakai.ecommerce.catalog.domain.exception.DuplicateSKUException;
 import com.sakai.ecommerce.shared.application.services.EventPublisher;
-import com.sakai.ecommerce.shared.domain.exception.BusinessError;
 import com.sakai.ecommerce.shared.application.services.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,7 +75,7 @@ public class CreateProduct {
         var hasDuplicates = skus.size() != skus.stream().distinct().count();
 
         if (hasDuplicates) {
-            throw new BusinessError("Duplicate SKUs found in variants");
+            throw new DuplicateSKUException();
         }
     }
 
