@@ -2,9 +2,11 @@ package com.sakai.ecommerce.catalog.domain;
 
 import com.sakai.ecommerce.shared.domain.exception.BusinessError;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
+@Getter
 @NoArgsConstructor
 public class ProductDimensions {
     private double height;
