@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-class VariantMapper {
+public class VariantMapper {
     ProductVariant map(CreateVariantCommand command, String coverImagePath, List<String> galleryPaths) {
         var variant = new ProductVariant(
                 new SKU(command.sku()),
