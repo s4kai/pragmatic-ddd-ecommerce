@@ -1,7 +1,12 @@
 package com.sakai.ecommerce.catalog.infra.controllers;
 
-import com.sakai.ecommerce.catalog.application.*;
 import com.sakai.ecommerce.catalog.application.dto.ProductResponse;
+import com.sakai.ecommerce.catalog.application.handlers.command.CreateProductHandler;
+import com.sakai.ecommerce.catalog.application.handlers.command.UpdateProductHandler;
+import com.sakai.ecommerce.catalog.application.handlers.query.GetProductByIdHandler;
+import com.sakai.ecommerce.catalog.application.handlers.query.SearchProductsHandler;
+import com.sakai.ecommerce.catalog.application.queries.GetProductByIdQuery;
+import com.sakai.ecommerce.catalog.application.queries.SearchProductsQuery;
 import com.sakai.ecommerce.catalog.infra.requests.CreateProductRequest;
 import com.sakai.ecommerce.catalog.infra.requests.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +21,15 @@ import java.util.UUID;
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
-    private final CreateProduct createProduct;
-    private final UpdateProduct updateProduct;
-    private final SearchProducts searchProducts;
-    private final GetProductById getProductById;
+    private final CreateProductHandler createProductHandler;
+    private final UpdateProductHandler updateProductHandler;
+    private final SearchProductsHandler searchProductsHandler;
+    private final GetProductByIdHandler getProductByIdHandler;
 
     @PostMapping
     public ResponseEntity<UUID> create(@ModelAttribute CreateProductRequest request) {
         return ResponseEntity.ok(
-            createProduct.handle(request.toCommand())
+            createProductHandler.handle(request.toCommand())
         );
     }
 
@@ -33,7 +38,7 @@ public class ProductController {
             @PathVariable UUID productId,
             @ModelAttribute UpdateProductRequest request
     ) {
-        updateProduct.handle(request.toCommand(productId));
+        updateProductHandler.handle(request.toCommand(productId));
         return ResponseEntity.noContent().build();
     }
 
@@ -43,11 +48,13 @@ public class ProductController {
             @RequestParam(required = false) String description,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(searchProducts.handle(name, description, pageable));
+        var query = new SearchProductsQuery(name, description, pageable);
+        return ResponseEntity.ok(searchProductsHandler.handle(query));
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getById(@PathVariable UUID productId) {
-        return ResponseEntity.ok(getProductById.handle(productId));
+        var query = new GetProductByIdQuery(productId);
+        return ResponseEntity.ok(getProductByIdHandler.handle(query));
     }
 }
