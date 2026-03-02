@@ -2,10 +2,7 @@ package com.sakai.ecommerce.catalog.domain;
 
 import com.sakai.ecommerce.shared.domain.core.AggregateRoot;
 import com.sakai.ecommerce.shared.domain.exception.BusinessError;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
