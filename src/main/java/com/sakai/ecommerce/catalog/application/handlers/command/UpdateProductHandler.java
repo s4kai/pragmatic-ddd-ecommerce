@@ -4,7 +4,6 @@ import com.sakai.ecommerce.catalog.application.ProductCleanupService;
 import com.sakai.ecommerce.catalog.application.commands.UpdateProductWithVariantsCommand;
 import com.sakai.ecommerce.catalog.application.commands.UpdateVariantCommand;
 import com.sakai.ecommerce.catalog.application.dto.ProductDimensionsDTO;
-import com.sakai.ecommerce.catalog.application.handlers.ProductVariantFilesCleanupHandler;
 import com.sakai.ecommerce.catalog.domain.*;
 import com.sakai.ecommerce.catalog.domain.exception.ProductNotFoundException;
 import com.sakai.ecommerce.shared.application.exception.StorageException;
@@ -24,7 +23,6 @@ public class UpdateProductHandler {
     private final EventPublisher eventPublisher;
     private final StorageService storageService;
     private final ProductCleanupService cleanupService;
-    private final ProductVariantFilesCleanupHandler filesCleanupHandler;
 
     @Transactional
     public void handle(UpdateProductWithVariantsCommand command) {
@@ -44,7 +42,7 @@ public class UpdateProductHandler {
             productRepository.save(product);
             eventPublisher.publish(product);
 
-            filesCleanupHandler.cleanupUnusedFiles(oldFiles, product.getVariantFiles());
+            cleanupService.cleanupUnusedFiles(oldFiles, product.getVariantFiles());
         } catch (StorageException exception) {
             cleanupService.cleanupVariantFiles(product.getProductVariants());
             throw exception;

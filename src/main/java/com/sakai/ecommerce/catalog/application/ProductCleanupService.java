@@ -19,6 +19,12 @@ public class ProductCleanupService {
         storageService.deleteAll(allFiles);
     }
 
+    public void cleanupUnusedFiles(List<String> oldFiles, List<String> newFiles) {
+        oldFiles.stream()
+                .filter(file -> !newFiles.contains(file))
+                .forEach(storageService::delete);
+    }
+
     private List<String> collectAllFiles(List<ProductVariant> variants) {
         List<String> files = new ArrayList<>();
 
