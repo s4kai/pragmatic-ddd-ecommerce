@@ -1,5 +1,7 @@
-package com.sakai.ecommerce.catalog.application;
+package com.sakai.ecommerce.catalog.application.handlers.command;
 
+import com.sakai.ecommerce.catalog.application.ProductCleanupService;
+import com.sakai.ecommerce.catalog.application.VariantMapper;
 import com.sakai.ecommerce.catalog.application.commands.CreateProductWithVariantsCommand;
 import com.sakai.ecommerce.catalog.application.commands.CreateVariantCommand;
 import com.sakai.ecommerce.catalog.application.dto.ProductDimensionsDTO;
@@ -29,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CreateProductTest {
+class CreateProductHandlerTest {
 
     @Mock
     private VariantMapper variantMapper;
@@ -47,7 +49,7 @@ class CreateProductTest {
     private StorageService storageService;
 
     @InjectMocks
-    private CreateProduct createProduct;
+    private CreateProductHandler createProductHandler;
 
     @Test
     void shouldCreateProductSuccessfully() {
@@ -58,7 +60,7 @@ class CreateProductTest {
         when(storageService.storeAll(any())).thenReturn(List.of("path1.jpg", "path2.jpg"));
         when(productRepository.save(any(Product.class))).thenReturn(productId);
 
-        var result = createProduct.handle(command);
+        var result = createProductHandler.handle(command);
 
         assertEquals(productId, result);
         verify(productRepository).save(any(Product.class));
@@ -78,7 +80,7 @@ class CreateProductTest {
             )
         );
 
-        assertThrows(BusinessError.class, () -> createProduct.handle(command));
+        assertThrows(BusinessError.class, () -> createProductHandler.handle(command));
         verify(productRepository, never()).save(any());
     }
 
@@ -91,7 +93,7 @@ class CreateProductTest {
         when(variantMapper.map(any(), any(), any())).thenReturn(mock(ProductVariant.class));
         when(productRepository.save(any(Product.class))).thenThrow(new RuntimeException("Database error"));
 
-        assertThrows(RuntimeException.class, () -> createProduct.handle(command));
+        assertThrows(RuntimeException.class, () -> createProductHandler.handle(command));
         verify(cleanupService).cleanupVariantFiles(any());
     }
 
@@ -111,7 +113,7 @@ class CreateProductTest {
         when(variantMapper.map(any(), any(), any())).thenReturn(mock(ProductVariant.class));
         when(productRepository.save(any(Product.class))).thenReturn(productId);
 
-        var result = createProduct.handle(command);
+        var result = createProductHandler.handle(command);
 
         assertNotNull(result);
         verify(productRepository).save(any(Product.class));

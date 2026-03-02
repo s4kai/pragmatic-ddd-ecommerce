@@ -1,9 +1,9 @@
-package com.sakai.ecommerce.catalog.application;
+package com.sakai.ecommerce.catalog.application.handlers.command;
 
+import com.sakai.ecommerce.catalog.application.ProductCleanupService;
 import com.sakai.ecommerce.catalog.application.commands.UpdateProductWithVariantsCommand;
 import com.sakai.ecommerce.catalog.application.commands.UpdateVariantCommand;
 import com.sakai.ecommerce.catalog.application.dto.ProductDimensionsDTO;
-import com.sakai.ecommerce.catalog.application.handlers.ProductVariantFilesCleanupHandler;
 import com.sakai.ecommerce.catalog.domain.*;
 import com.sakai.ecommerce.shared.application.FileUpload;
 import com.sakai.ecommerce.shared.application.services.EventPublisher;
@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateProductTest {
+class UpdateProductHandlerTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -43,10 +43,10 @@ class UpdateProductTest {
     private ProductCleanupService cleanupService;
 
     @Mock
-    private ProductVariantFilesCleanupHandler filesCleanupHandler;
+    private  ProductCleanupService filesCleanupHandler;
 
     @InjectMocks
-    private UpdateProduct updateProduct;
+    private UpdateProductHandler updateProductHandler;
 
     @Test
     void shouldUpdateProductSuccessfully() {
@@ -58,7 +58,7 @@ class UpdateProductTest {
         when(storageService.store(any())).thenReturn("new/path.jpg");
         when(storageService.storeAll(any())).thenReturn(List.of("new/gallery.jpg"));
 
-        assertDoesNotThrow(() -> updateProduct.handle(command));
+        assertDoesNotThrow(() -> updateProductHandler.handle(command));
 
         verify(productRepository).save(product);
         verify(eventPublisher).publish(product);
@@ -71,7 +71,7 @@ class UpdateProductTest {
 
         when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-        assertThrows(BusinessError.class, () -> updateProduct.handle(command));
+        assertThrows(BusinessError.class, () -> updateProductHandler.handle(command));
         verify(productRepository, never()).save(any());
     }
 
@@ -92,7 +92,7 @@ class UpdateProductTest {
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
-        assertThrows(BusinessError.class, () -> updateProduct.handle(command));
+        assertThrows(BusinessError.class, () -> updateProductHandler.handle(command));
         verify(productRepository, never()).save(any());
     }
 
@@ -113,7 +113,7 @@ class UpdateProductTest {
         when(storageService.store(any())).thenReturn("path.jpg");
         when(storageService.storeAll(any())).thenReturn(List.of());
 
-        assertDoesNotThrow(() -> updateProduct.handle(command));
+        assertDoesNotThrow(() -> updateProductHandler.handle(command));
         verify(productRepository).save(product);
     }
 

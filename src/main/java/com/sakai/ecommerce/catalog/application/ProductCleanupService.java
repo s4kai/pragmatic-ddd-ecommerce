@@ -14,7 +14,7 @@ import java.util.Objects;
 public class ProductCleanupService {
     private final StorageService storageService;
 
-    void cleanupVariantFiles(List<ProductVariant> variants) {
+    public void cleanupVariantFiles(List<ProductVariant> variants) {
         var allFiles = collectAllFiles(variants);
         storageService.deleteAll(allFiles);
     }
