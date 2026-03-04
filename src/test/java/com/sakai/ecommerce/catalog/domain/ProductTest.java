@@ -116,6 +116,100 @@ class ProductTest {
         assertThrows(BusinessError.class, () -> product.addVariant(duplicateVariant));
     }
 
+    @Test
+    void shouldUpdateName() {
+        var product = validProduct();
+        product.updateName("New Name");
+
+        assertEquals("New Name", product.getName());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNameWithNull() {
+        var product = validProduct();
+        assertThrows(BusinessError.class, () -> product.updateName(null));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNameWithBlank() {
+        var product = validProduct();
+        assertThrows(BusinessError.class, () -> product.updateName(""));
+    }
+
+    @Test
+    void shouldUpdateDescription() {
+        var product = validProduct();
+        product.updateDescription("New Description");
+
+        assertEquals("New Description", product.getDescription());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingDescriptionWithNull() {
+        var product = validProduct();
+        assertThrows(BusinessError.class, () -> product.updateDescription(null));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingDescriptionWithBlank() {
+        var product = validProduct();
+        assertThrows(BusinessError.class, () -> product.updateDescription(""));
+    }
+
+    @Test
+    void shouldFindVariantBySKU() {
+        var product = validProduct();
+        var variant = product.findVariantBySKU(new SKU("SKU-001"));
+
+        assertNotNull(variant);
+        assertEquals("Variant Name", variant.getName());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenVariantNotFound() {
+        var product = validProduct();
+        assertThrows(BusinessError.class, () -> product.findVariantBySKU(new SKU("SKU-999")));
+    }
+
+    @Test
+    void shouldValidateUniqueSKUs() {
+        var product = validProduct();
+        var skus = List.of(new SKU("SKU-001"), new SKU("SKU-002"));
+
+        assertDoesNotThrow(() -> product.validateUniqueSKUs(skus));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSKUsAreDuplicated() {
+        var product = validProduct();
+        var skus = List.of(new SKU("SKU-001"), new SKU("SKU-001"));
+
+        assertThrows(BusinessError.class, () -> product.validateUniqueSKUs(skus));
+    }
+
+    @Test
+    void shouldGetVariantFiles() {
+        var product = validProduct();
+        var variant = product.getProductVariants().get(0);
+        variant.updateCoverImage("cover.jpg");
+        variant.updateGallery(List.of("img1.jpg", "img2.jpg"));
+
+        var files = product.getVariantFiles();
+
+        assertEquals(3, files.size());
+        assertTrue(files.contains("cover.jpg"));
+    }
+
+    @Test
+    void shouldReturnUnmodifiableListOfVariants() {
+        var product = validProduct();
+        var variants = product.getProductVariants();
+
+        assertThrows(UnsupportedOperationException.class, () -> 
+            variants.add(validVariant())
+        );
+    }
+
     private Product validProduct() {
         return new Product(
                 "Product Name",

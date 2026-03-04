@@ -72,9 +72,11 @@ class ProductVariantTest {
     void shouldUpdateGallery() {
         var variant = validVariant();
         var gallery = List.of("image1.jpg", "image2.jpg");
+        var galleryExpected = List.of(new ProductGallery("image1.jpg"), new ProductGallery("image2.jpg"));
+
         variant.updateGallery(gallery);
 
-        assertEquals(gallery, variant.getGallery());
+        assertEquals(galleryExpected, variant.getGallery());
     }
 
     @Test
@@ -84,6 +86,114 @@ class ProductVariantTest {
         variant.updateDetails(details);
 
         assertEquals(details, variant.getDetails());
+    }
+
+    @Test
+    void shouldUpdateName() {
+        var variant = validVariant();
+        variant.updateName("New Name");
+
+        assertEquals("New Name", variant.getName());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNameWithNull() {
+        var variant = validVariant();
+        assertThrows(BusinessError.class, () -> variant.updateName(null));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNameWithBlank() {
+        var variant = validVariant();
+        assertThrows(BusinessError.class, () -> variant.updateName(""));
+    }
+
+    @Test
+    void shouldUpdatePrice() {
+        var variant = validVariant();
+        var newPrice = new Money(BigDecimal.valueOf(200), "BRL");
+        variant.updatePrice(newPrice);
+
+        assertEquals(newPrice, variant.getPrice());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingPriceWithNull() {
+        var variant = validVariant();
+        assertThrows(BusinessError.class, () -> variant.updatePrice(null));
+    }
+
+    @Test
+    void shouldUpdateAllFieldsAtOnce() {
+        var variant = validVariant();
+        var newPrice = new Money(BigDecimal.valueOf(150), "BRL");
+        var gallery = List.of("img1.jpg", "img2.jpg");
+        Map<String, Object> details = Map.of("color", "blue");
+
+        variant.update("Updated Name", newPrice, "cover.jpg", gallery, details);
+
+        assertEquals("Updated Name", variant.getName());
+        assertEquals(newPrice, variant.getPrice());
+        assertEquals("cover.jpg", variant.getCoverImage());
+        assertEquals(2, variant.getGallery().size());
+        assertEquals(details, variant.getDetails());
+    }
+
+    @Test
+    void shouldUpdateOnlyNonNullFields() {
+        var variant = validVariant();
+        var originalPrice = variant.getPrice();
+
+        variant.update("New Name", null, null, null, null);
+
+        assertEquals("New Name", variant.getName());
+        assertEquals(originalPrice, variant.getPrice());
+    }
+
+    @Test
+    void shouldReturnTrueWhenSKUMatches() {
+        var variant = validVariant();
+        assertTrue(variant.hasSameSKU(new SKU("SKU-001")));
+    }
+
+    @Test
+    void shouldReturnFalseWhenSKUDoesNotMatch() {
+        var variant = validVariant();
+        assertFalse(variant.hasSameSKU(new SKU("SKU-002")));
+    }
+
+    @Test
+    void shouldReturnFilesWithCoverImageAndGallery() {
+        var variant = validVariant();
+        variant.updateCoverImage("cover.jpg");
+        variant.updateGallery(List.of("img1.jpg", "img2.jpg"));
+
+        var files = variant.getFiles();
+
+        assertEquals(3, files.size());
+        assertTrue(files.contains("cover.jpg"));
+        assertTrue(files.contains("img1.jpg"));
+        assertTrue(files.contains("img2.jpg"));
+    }
+
+    @Test
+    void shouldReturnOnlyCoverImageWhenGalleryIsEmpty() {
+        var variant = validVariant();
+        variant.updateCoverImage("cover.jpg");
+
+        var files = variant.getFiles();
+
+        assertEquals(1, files.size());
+        assertEquals("cover.jpg", files.get(0));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoFiles() {
+        var variant = validVariant();
+
+        var files = variant.getFiles();
+
+        assertTrue(files.isEmpty());
     }
 
     private ProductVariant validVariant() {

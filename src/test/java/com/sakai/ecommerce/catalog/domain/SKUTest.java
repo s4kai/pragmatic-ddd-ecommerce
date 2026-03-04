@@ -25,4 +25,20 @@ class SKUTest {
         assertThrows(BusinessError.class, () -> new SKU(""));
         assertThrows(BusinessError.class, () -> new SKU("   "));
     }
+
+    @Test
+    void shouldBeEqualWhenValuesAreTheSame() {
+        var sku1 = new SKU("SKU-001");
+        var sku2 = new SKU("SKU-001");
+
+        assertEquals(sku1, sku2);
+    }
+
+    @Test
+    void shouldNotBeEqualWhenValuesAreDifferent() {
+        var sku1 = new SKU("SKU-001");
+        var sku2 = new SKU("SKU-002");
+
+        assertNotEquals(sku1, sku2);
+    }
 }

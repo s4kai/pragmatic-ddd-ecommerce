@@ -37,4 +37,14 @@ class ProductDimensionsTest {
         assertThrows(BusinessError.class, () -> new ProductDimensions(10.0, 20.0, 30.0, 0));
         assertThrows(BusinessError.class, () -> new ProductDimensions(10.0, 20.0, 30.0, -1));
     }
+
+    @Test
+    void shouldGetAllDimensionValues() {
+        var dimensions = new ProductDimensions(10.0, 20.0, 30.0, 5.0);
+
+        assertEquals(10.0, dimensions.getHeight());
+        assertEquals(20.0, dimensions.getWidth());
+        assertEquals(30.0, dimensions.getDepth());
+        assertEquals(5.0, dimensions.getWeight());
+    }
 }
