@@ -1,6 +1,7 @@
 package com.sakai.ecommerce.catalog.domain;
 
 import com.sakai.ecommerce.shared.domain.Money;
+import com.sakai.ecommerce.shared.domain.core.BaseEntity;
 import com.sakai.ecommerce.shared.domain.exception.BusinessError;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,12 +12,12 @@ import org.hibernate.type.SqlTypes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class ProductVariant {
-    @EmbeddedId
+public class ProductVariant extends BaseEntity<UUID> {
     private SKU sku;
 
     private String name;
@@ -26,6 +27,7 @@ public class ProductVariant {
     private Money price;
 
     @OneToMany
+    @JoinColumn(name = "product_variant_id")
     private List<ProductGallery> gallery;
 
     @JdbcTypeCode(SqlTypes.JSON)

@@ -20,6 +20,7 @@ public class Product extends AggregateRoot<UUID> {
     @Embedded
     private ProductDimensions dimensions;
 
+    @JoinColumn(name = "product_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariant> productVariants;
 
