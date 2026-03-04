@@ -1,5 +1,6 @@
 package com.sakai.ecommerce.shared.domain;
 
+import com.sakai.ecommerce.shared.domain.exception.BusinessError;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +16,8 @@ import java.util.Currency;
 public class Money {
     private BigDecimal amount;
     private String currency;
+
+    public static Money ZERO = new Money(BigDecimal.ZERO);
 
     public Money(BigDecimal amount, Currency currency) {
         validateAmount(amount);
@@ -44,5 +47,29 @@ public class Money {
     private void validateCurrency(String currencyCode) {
         if (currencyCode == null || currencyCode.isBlank()) throw new IllegalArgumentException("Currency cannot be null or empty");
         Currency.getInstance(currencyCode);
+    }
+
+    public Money multiply(int multiplier) {
+        return multiply(BigDecimal.valueOf(multiplier));
+    }
+
+    public Money add(Money other){
+        return new Money(this.amount.add(other.amount), this.currency);
+    }
+
+    public Money multiply(BigDecimal multiplier) {
+        return new Money(amount.multiply(multiplier), currency);
+    }
+
+    public static Money of(Integer amount){
+        try{
+            return new Money(BigDecimal.valueOf(amount));
+        }catch (Exception e){
+            throw new BusinessError("Invalid amount: " + amount, e);
+        }
+    }
+
+    public static Money of(BigDecimal amount, Currency currency){
+        return new Money(amount, currency);
     }
 }
