@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BaseEntity<ID> {
     @Id
     @EqualsAndHashCode.Include
