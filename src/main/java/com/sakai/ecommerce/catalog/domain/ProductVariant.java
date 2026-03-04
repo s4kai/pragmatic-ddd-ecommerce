@@ -25,8 +25,8 @@ public class ProductVariant {
     @Embedded
     private Money price;
 
-    @ElementCollection
-    private List<String> gallery;
+    @OneToMany
+    private List<ProductGallery> gallery;
 
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> details;
@@ -37,6 +37,7 @@ public class ProductVariant {
         this.sku = sku;
         this.name = name;
         this.price = price;
+        this.gallery = new ArrayList<>();
     }
 
     public void update(String name, Money price, String coverImage, List<String> gallery, Map<String, Object> details) {
@@ -55,8 +56,10 @@ public class ProductVariant {
         this.details = details;
     }
 
-    public void updateGallery(List<String> gallery){
-        this.gallery = gallery;
+    public void updateGallery(List<String> galleryString){
+        this.gallery = galleryString.stream()
+                .map(ProductGallery::new)
+                .toList();
     }
 
     boolean hasSameSKU(SKU sku){
@@ -76,7 +79,11 @@ public class ProductVariant {
     public List<String> getFiles() {
         var files = new ArrayList<String>();
         if (coverImage != null) files.add(coverImage);
-        if (gallery != null) files.addAll(gallery);
+        if (gallery != null) files.addAll(
+            gallery.stream()
+                .map(ProductGallery::getId)
+                .toList()
+        );
         return files;
     }
 

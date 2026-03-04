@@ -1,5 +1,6 @@
 package com.sakai.ecommerce.catalog.application.dto;
 
+import com.sakai.ecommerce.catalog.domain.ProductGallery;
 import com.sakai.ecommerce.catalog.domain.ProductVariant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +27,9 @@ public class ProductVariantResponse {
                 variant.getPrice().getAmount(),
                 variant.getPrice().getCurrency(),
                 variant.getCoverImage(),
-                variant.getGallery(),
+                variant.getGallery().stream()
+                        .map(ProductGallery::getId)
+                        .toList(),
                 variant.getDetails()
         );
     }
