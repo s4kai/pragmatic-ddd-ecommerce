@@ -4,8 +4,8 @@ import com.sakai.ecommerce.customer.application.commands.CreateCustomerCommand;
 import com.sakai.ecommerce.customer.domain.Customer;
 import com.sakai.ecommerce.customer.domain.CustomerRepository;
 import com.sakai.ecommerce.customer.domain.exceptions.CustomerAlreadyExists;
-import com.sakai.ecommerce.shared.dto.AddressDTO;
-import com.sakai.ecommerce.shared.infra.DomainEventPublisher;
+import com.sakai.ecommerce.shared.application.dto.AddressDTO;
+import com.sakai.ecommerce.shared.application.services.EventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,8 +24,10 @@ class CreateCustomerTest {
 
     @Mock
     private CustomerRepository customerRepository;
+
     @Mock
-    private DomainEventPublisher eventPublisher;
+    private EventPublisher eventPublisher;
+
     @InjectMocks
     private CreateCustomer createCustomer;
 

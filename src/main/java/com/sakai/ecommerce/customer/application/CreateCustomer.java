@@ -6,8 +6,8 @@ import com.sakai.ecommerce.customer.domain.ContactInfo;
 import com.sakai.ecommerce.customer.domain.Customer;
 import com.sakai.ecommerce.customer.domain.CustomerRepository;
 import com.sakai.ecommerce.customer.domain.exceptions.CustomerAlreadyExists;
-import com.sakai.ecommerce.shared.dto.AddressDTO;
-import com.sakai.ecommerce.shared.infra.DomainEventPublisher;
+import com.sakai.ecommerce.shared.application.dto.AddressDTO;
+import com.sakai.ecommerce.shared.application.services.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 class CreateCustomer {
     private final CustomerRepository customerRepository;
-    private final DomainEventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
 
     @Transactional
     public UUID handle(CreateCustomerCommand command) {

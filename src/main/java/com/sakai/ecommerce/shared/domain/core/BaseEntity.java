@@ -1,4 +1,4 @@
-package com.sakai.ecommerce.shared.core;
+package com.sakai.ecommerce.shared.domain.core;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BaseEntity<ID> {
     @Id
     @EqualsAndHashCode.Include
