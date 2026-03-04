@@ -16,6 +16,9 @@ public class Money {
     private BigDecimal amount;
     private String currency;
 
+    public static Money ZERO = new Money(BigDecimal.ZERO);
+
+
     public Money(BigDecimal amount, Currency currency) {
         validateAmount(amount);
         validateCurrency(currency.getCurrencyCode());
@@ -44,5 +47,17 @@ public class Money {
     private void validateCurrency(String currencyCode) {
         if (currencyCode == null || currencyCode.isBlank()) throw new IllegalArgumentException("Currency cannot be null or empty");
         Currency.getInstance(currencyCode);
+    }
+
+    public Money multiply(int multiplier) {
+        return multiply(BigDecimal.valueOf(multiplier));
+    }
+
+    public Money add(Money other){
+        return new Money(this.amount.add(other.amount), this.currency);
+    }
+
+    public Money multiply(BigDecimal multiplier) {
+        return new Money(amount.multiply(multiplier), currency);
     }
 }
