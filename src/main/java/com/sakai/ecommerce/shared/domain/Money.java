@@ -1,5 +1,6 @@
 package com.sakai.ecommerce.shared.domain;
 
+import com.sakai.ecommerce.shared.domain.exception.BusinessError;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,7 +18,6 @@ public class Money {
     private String currency;
 
     public static Money ZERO = new Money(BigDecimal.ZERO);
-
 
     public Money(BigDecimal amount, Currency currency) {
         validateAmount(amount);
@@ -59,5 +59,17 @@ public class Money {
 
     public Money multiply(BigDecimal multiplier) {
         return new Money(amount.multiply(multiplier), currency);
+    }
+
+    public static Money of(Integer amount){
+        try{
+            return new Money(BigDecimal.valueOf(amount));
+        }catch (Exception e){
+            throw new BusinessError("Invalid amount: " + amount, e);
+        }
+    }
+
+    public static Money of(BigDecimal amount, Currency currency){
+        return new Money(amount, currency);
     }
 }

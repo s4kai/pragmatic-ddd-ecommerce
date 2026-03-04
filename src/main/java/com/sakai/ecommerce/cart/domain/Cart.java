@@ -36,6 +36,7 @@ public class Cart extends AggregateRoot<UUID> {
         var cart = new Cart();
         cart.id = UUID.randomUUID();
         cart.sessionId = sessionId;
+        cart.status = CartStatus.ACTIVE;
         return cart;
     }
 
