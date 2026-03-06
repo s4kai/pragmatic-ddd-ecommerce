@@ -1,0 +1,22 @@
+meta {
+  name: Upload Variant Images
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/products/{{productId}}/variants/images
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:multipart-form {
+  sku: SKU-001
+  ~coverImage: @file(/path/to/cover.jpg)
+  ~gallery: @file(/path/to/image1.jpg)
+  ~gallery: @file(/path/to/image2.jpg)
+}

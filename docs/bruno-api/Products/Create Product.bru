@@ -6,7 +6,7 @@ meta {
 
 post {
   url: {{baseUrl}}/products
-  body: multipartForm
+  body: json
   auth: bearer
 }
 
@@ -14,17 +14,24 @@ auth:bearer {
   token: {{accessToken}}
 }
 
-body:multipart-form {
-  name: Product Name
-  description: Product Description
-  dimensions.height: 10.5
-  dimensions.width: 20.0
-  dimensions.depth: 15.0
-  dimensions.weight: 2.5
-  variants[0].sku: SKU-001
-  variants[0].name: Variant 1
-  variants[0].price: 99.99
-  variants[0].currency: USD
-  variants[0].details.color: Red
-  variants[0].details.size: M
+body:json {
+  {
+    "name": "Product Name",
+    "description": "Product Description",
+    "dimensions": {
+      "height": 10.5,
+      "width": 20.0,
+      "depth": 15.0,
+      "weight": 2.5
+    },
+    "variants": [
+      {
+        "sku": "SKU-001",
+        "name": "Variant 1",
+        "price": 99.99,
+        "currency": "USD",
+        "details": "{\"color\":\"red\",\"size\":\"M\}¨
+      }
+    ]
+  }
 }
