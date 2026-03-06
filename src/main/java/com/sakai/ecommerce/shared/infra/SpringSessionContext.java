@@ -1,12 +1,17 @@
 package com.sakai.ecommerce.shared.infra;
 
+import com.sakai.ecommerce.shared.application.security.AuthenticationContext;
 import com.sakai.ecommerce.shared.application.security.SessionContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
+@RequiredArgsConstructor
 public class SpringSessionContext implements SessionContext {
+
+    private final AuthenticationContext context;
 
     @Override
     public String getCurrentSessionId() {
@@ -14,12 +19,10 @@ public class SpringSessionContext implements SessionContext {
         if (attributes == null) {
             return null;
         }
-        
-        var session = attributes.getRequest().getSession(false);
-        if (session == null) {
-            return null;
-        }
-        
+
+        boolean hasToCreateSession = !context.isAuthenticated();
+
+        var session = attributes.getRequest().getSession(hasToCreateSession);
         return session.getId();
     }
 

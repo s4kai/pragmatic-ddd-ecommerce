@@ -43,6 +43,9 @@ public class CartRetriever {
     }
 
     private Cart getAnonymousCart(String sessionId) {
+        if(sessionId == null || sessionId.isBlank())
+            throw new RuntimeException("Erro ao processar carrinho");
+
         return cartRepository.findBySessionId(sessionId)
                 .orElseGet(() -> Cart.createAnonymous(sessionId));
     }
