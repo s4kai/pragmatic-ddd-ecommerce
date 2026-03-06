@@ -1,4 +1,5 @@
 package com.sakai.ecommerce.auth.application.commands;
 
-public class LogoutCommand {
-}
+import java.util.UUID;
+
+public record LogoutCommand(UUID userId) { }
