@@ -20,7 +20,8 @@ public class SpringAuthenticationContext implements AuthenticationContext {
         if (principal instanceof UUID uuid) {
             return uuid;
         }
-        throw new IllegalStateException("Usuário não autenticado ou principal inválido");
+
+        return null;
     }
 
     @Override
