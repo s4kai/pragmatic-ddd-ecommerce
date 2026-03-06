@@ -1,13 +1,11 @@
 package com.sakai.ecommerce.catalog.application.handlers.command;
 
-import com.sakai.ecommerce.catalog.application.ProductCleanupService;
-import com.sakai.ecommerce.catalog.application.commands.UpdateProductWithVariantsCommand;
-import com.sakai.ecommerce.catalog.application.commands.UpdateVariantCommand;
+import com.sakai.ecommerce.catalog.application.commands.UpdateProductCommand;
+import com.sakai.ecommerce.catalog.application.commands.UpdateVariantDataCommand;
 import com.sakai.ecommerce.catalog.application.dto.ProductDimensionsDTO;
 import com.sakai.ecommerce.catalog.domain.*;
-import com.sakai.ecommerce.shared.application.FileUpload;
+import com.sakai.ecommerce.catalog.domain.exception.ProductNotFoundException;
 import com.sakai.ecommerce.shared.application.services.EventPublisher;
-import com.sakai.ecommerce.shared.application.services.StorageService;
 import com.sakai.ecommerce.shared.domain.Money;
 import com.sakai.ecommerce.shared.domain.exception.BusinessError;
 import org.junit.jupiter.api.Test;
@@ -16,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +33,6 @@ class UpdateProductHandlerTest {
     @Mock
     private EventPublisher eventPublisher;
 
-    @Mock
-    private StorageService storageService;
-
-    @Mock
-    private ProductCleanupService cleanupService;
-
-    @Mock
-    private  ProductCleanupService filesCleanupHandler;
-
     @InjectMocks
     private UpdateProductHandler updateProductHandler;
 
@@ -55,8 +43,6 @@ class UpdateProductHandlerTest {
         var command = validCommand(productId);
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(storageService.store(any())).thenReturn("new/path.jpg");
-        when(storageService.storeAll(any())).thenReturn(List.of("new/gallery.jpg"));
 
         assertDoesNotThrow(() -> updateProductHandler.handle(command));
 
@@ -71,7 +57,7 @@ class UpdateProductHandlerTest {
 
         when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-        assertThrows(BusinessError.class, () -> updateProductHandler.handle(command));
+        assertThrows(ProductNotFoundException.class, () -> updateProductHandler.handle(command));
         verify(productRepository, never()).save(any());
     }
 
@@ -79,7 +65,7 @@ class UpdateProductHandlerTest {
     void shouldThrowExceptionWhenDuplicateSKUs() {
         var productId = UUID.randomUUID();
         var product = createProduct();
-        var command = new UpdateProductWithVariantsCommand(
+        var command = new UpdateProductCommand(
             productId,
             "Updated Name",
             "Updated Description",
@@ -101,7 +87,7 @@ class UpdateProductHandlerTest {
         var productId = UUID.randomUUID();
         var product = createProduct();
         var dimensions = new ProductDimensionsDTO(15.0, 25.0, 35.0, 7.5);
-        var command = new UpdateProductWithVariantsCommand(
+        var command = new UpdateProductCommand(
             productId,
             "Updated Name",
             "Updated Description",
@@ -110,8 +96,6 @@ class UpdateProductHandlerTest {
         );
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(storageService.store(any())).thenReturn("path.jpg");
-        when(storageService.storeAll(any())).thenReturn(List.of());
 
         assertDoesNotThrow(() -> updateProductHandler.handle(command));
         verify(productRepository).save(product);
@@ -123,14 +107,11 @@ class UpdateProductHandlerTest {
             "Variant Name",
             new Money(BigDecimal.valueOf(100), "BRL")
         );
-        variant.updateCoverImage("old/cover.jpg");
-        variant.updateGallery(List.of("old/gallery1.jpg"));
-
         return new Product("Product Name", "Description", List.of(variant));
     }
 
-    private UpdateProductWithVariantsCommand validCommand(UUID productId) {
-        return new UpdateProductWithVariantsCommand(
+    private UpdateProductCommand validCommand(UUID productId) {
+        return new UpdateProductCommand(
             productId,
             "Updated Product Name",
             "Updated Description",
@@ -139,22 +120,12 @@ class UpdateProductHandlerTest {
         );
     }
 
-    private UpdateVariantCommand validVariantCommand(String sku) {
-        var coverImage = new FileUpload(
-            "cover.jpg",
-            () -> new ByteArrayInputStream(new byte[0]),
-            "image/jpeg",
-            1024L
-        );
-
-        return new UpdateVariantCommand(
-            UUID.randomUUID(),
+    private UpdateVariantDataCommand validVariantCommand(String sku) {
+        return new UpdateVariantDataCommand(
             sku,
             "Updated Variant Name",
-            coverImage,
             BigDecimal.valueOf(150),
             "BRL",
-            List.of(),
             Map.of("color", "blue")
         );
     }

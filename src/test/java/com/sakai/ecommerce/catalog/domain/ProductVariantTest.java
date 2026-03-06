@@ -72,11 +72,10 @@ class ProductVariantTest {
     void shouldUpdateGallery() {
         var variant = validVariant();
         var gallery = List.of("image1.jpg", "image2.jpg");
-        var galleryExpected = List.of(new ProductGallery("image1.jpg"), new ProductGallery("image2.jpg"));
 
         variant.updateGallery(gallery);
 
-        assertEquals(galleryExpected, variant.getGallery());
+        assertEquals(gallery, variant.getGallery());
     }
 
     @Test
@@ -127,15 +126,12 @@ class ProductVariantTest {
     void shouldUpdateAllFieldsAtOnce() {
         var variant = validVariant();
         var newPrice = new Money(BigDecimal.valueOf(150), "BRL");
-        var gallery = List.of("img1.jpg", "img2.jpg");
         Map<String, Object> details = Map.of("color", "blue");
 
-        variant.update("Updated Name", newPrice, "cover.jpg", gallery, details);
+        variant.updateData("Updated Name", newPrice, details);
 
         assertEquals("Updated Name", variant.getName());
         assertEquals(newPrice, variant.getPrice());
-        assertEquals("cover.jpg", variant.getCoverImage());
-        assertEquals(2, variant.getGallery().size());
         assertEquals(details, variant.getDetails());
     }
 
@@ -144,10 +140,21 @@ class ProductVariantTest {
         var variant = validVariant();
         var originalPrice = variant.getPrice();
 
-        variant.update("New Name", null, null, null, null);
+        variant.updateData("New Name", null, null);
 
         assertEquals("New Name", variant.getName());
         assertEquals(originalPrice, variant.getPrice());
+    }
+
+    @Test
+    void shouldUpdateImages() {
+        var variant = validVariant();
+        var gallery = List.of("img1.jpg", "img2.jpg");
+
+        variant.updateImages("cover.jpg", gallery);
+
+        assertEquals("cover.jpg", variant.getCoverImage());
+        assertEquals(gallery, variant.getGallery());
     }
 
     @Test
@@ -184,7 +191,7 @@ class ProductVariantTest {
         var files = variant.getFiles();
 
         assertEquals(1, files.size());
-        assertEquals("cover.jpg", files.get(0));
+        assertEquals("cover.jpg", files.getFirst());
     }
 
     @Test
