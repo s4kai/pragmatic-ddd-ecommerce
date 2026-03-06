@@ -26,9 +26,10 @@ public class ProductVariant extends BaseEntity<UUID> {
     @Embedded
     private Money price;
 
-    @OneToMany
-    @JoinColumn(name = "product_variant_id")
-    private List<ProductGallery> gallery;
+    @ElementCollection
+    @CollectionTable(name = "product_gallery", joinColumns = @JoinColumn(name = "product_variant_id"))
+    @Column(name = "url")
+    private List<String> gallery;
 
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> details;
@@ -36,18 +37,22 @@ public class ProductVariant extends BaseEntity<UUID> {
     public ProductVariant(SKU sku, String name, Money price){
         validateCreate(sku, name, price);
 
+        this.id = UUID.randomUUID();
         this.sku = sku;
         this.name = name;
         this.price = price;
         this.gallery = new ArrayList<>();
     }
 
-    public void update(String name, Money price, String coverImage, List<String> gallery, Map<String, Object> details) {
+    public void updateData(String name, Money price, Map<String, Object> details) {
         if (name != null) updateName(name);
         if (price != null) updatePrice(price);
+        if (details != null) updateDetails(details);
+    }
+
+    public void updateImages(String coverImage, List<String> gallery) {
         if (coverImage != null) updateCoverImage(coverImage);
         if (gallery != null) updateGallery(gallery);
-        if (details != null) updateDetails(details);
     }
 
     public void updateCoverImage(String coverImage){
@@ -58,10 +63,8 @@ public class ProductVariant extends BaseEntity<UUID> {
         this.details = details;
     }
 
-    public void updateGallery(List<String> galleryString){
-        this.gallery = galleryString.stream()
-                .map(ProductGallery::new)
-                .toList();
+    public void updateGallery(List<String> gallery){
+        this.gallery = gallery;
     }
 
     boolean hasSameSKU(SKU sku){
@@ -81,11 +84,7 @@ public class ProductVariant extends BaseEntity<UUID> {
     public List<String> getFiles() {
         var files = new ArrayList<String>();
         if (coverImage != null) files.add(coverImage);
-        if (gallery != null) files.addAll(
-            gallery.stream()
-                .map(ProductGallery::getId)
-                .toList()
-        );
+        if (gallery != null) files.addAll(gallery);
         return files;
     }
 
