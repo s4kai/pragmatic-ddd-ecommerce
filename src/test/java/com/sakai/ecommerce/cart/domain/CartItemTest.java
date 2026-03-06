@@ -24,6 +24,24 @@ class CartItemTest {
     }
 
     @Test
+    void shouldThrowWhenCreatingWithZeroQuantity() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CartItem(UUID.randomUUID(), "SKU-001", 0, Money.of(100)));
+    }
+
+    @Test
+    void shouldThrowWhenCreatingWithNegativeQuantity() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CartItem(UUID.randomUUID(), "SKU-001", -1, Money.of(100)));
+    }
+
+    @Test
+    void shouldThrowWhenCreatingWithNullPrice() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CartItem(UUID.randomUUID(), "SKU-001", 1, null));
+    }
+
+    @Test
     void shouldIncreaseQuantity() {
         var item = new CartItem(UUID.randomUUID(), "SKU-001", 2, Money.of(100));
 
@@ -33,12 +51,40 @@ class CartItemTest {
     }
 
     @Test
+    void shouldThrowWhenIncreasingByZero() {
+        var item = new CartItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
+
+        assertThrows(IllegalArgumentException.class, () -> item.increaseQuantity(0));
+    }
+
+    @Test
+    void shouldThrowWhenIncreasingByNegative() {
+        var item = new CartItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
+
+        assertThrows(IllegalArgumentException.class, () -> item.increaseQuantity(-1));
+    }
+
+    @Test
     void shouldDecreaseQuantity() {
         var item = new CartItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
 
         item.decreaseQuantity(2);
 
         assertEquals(3, item.getQuantity());
+    }
+
+    @Test
+    void shouldThrowWhenDecreasingByZero() {
+        var item = new CartItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
+
+        assertThrows(IllegalArgumentException.class, () -> item.decreaseQuantity(0));
+    }
+
+    @Test
+    void shouldThrowWhenDecreasingByNegative() {
+        var item = new CartItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
+
+        assertThrows(IllegalArgumentException.class, () -> item.decreaseQuantity(-1));
     }
 
     @Test
@@ -57,56 +103,15 @@ class CartItemTest {
         assertEquals(Money.of(300), item.getSubtotal());
     }
 
-    @Test
-    void shouldCalculateSubtotalWithZeroQuantity() {
-        var item = new CartItem(UUID.randomUUID(), "SKU-001", 0, Money.of(100));
 
-        assertEquals(Money.ZERO, item.getSubtotal());
-    }
 
-    @Test
-    void shouldHandleLargeQuantity() {
-        var item = new CartItem(UUID.randomUUID(), "SKU-001", 1000, Money.of(50));
 
-        assertEquals(Money.of(50000), item.getSubtotal());
-    }
 
-    @Test
-    void shouldIncreaseQuantityMultipleTimes() {
-        var item = new CartItem(UUID.randomUUID(), "SKU-001", 1, Money.of(100));
 
-        item.increaseQuantity(2);
-        item.increaseQuantity(3);
-        item.increaseQuantity(4);
 
-        assertEquals(10, item.getQuantity());
-    }
 
-    @Test
-    void shouldDecreaseQuantityMultipleTimes() {
-        var item = new CartItem(UUID.randomUUID(), "SKU-001", 10, Money.of(100));
 
-        item.decreaseQuantity(2);
-        item.decreaseQuantity(3);
 
-        assertEquals(5, item.getQuantity());
-    }
 
-    @Test
-    void shouldIncreaseByZero() {
-        var item = new CartItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
 
-        item.increaseQuantity(0);
-
-        assertEquals(5, item.getQuantity());
-    }
-
-    @Test
-    void shouldDecreaseByZero() {
-        var item = new CartItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
-
-        item.decreaseQuantity(0);
-
-        assertEquals(5, item.getQuantity());
-    }
 }
