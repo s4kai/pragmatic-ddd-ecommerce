@@ -3,6 +3,7 @@ package com.sakai.ecommerce.cart.application.handlers;
 import com.sakai.ecommerce.cart.application.CartRetriever;
 import com.sakai.ecommerce.cart.application.dto.CartResponse;
 import com.sakai.ecommerce.cart.application.queries.GetCartQuery;
+import com.sakai.ecommerce.cart.domain.CartItem;
 import com.sakai.ecommerce.catalog.ProductInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class GetCartHandler {
         );
     }
 
-    private CartResponse.CartItemResponse toCartItemResponse(com.sakai.ecommerce.cart.domain.CartItem item) {
+    private CartResponse.CartItemResponse toCartItemResponse(CartItem item) {
         var productInfo = productInfoService.getProductInfo(item.getProductId(), item.getSku())
                 .map(this::toProductInfo)
                 .orElse(null);
