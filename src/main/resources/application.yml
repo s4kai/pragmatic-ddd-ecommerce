@@ -2,6 +2,12 @@ spring:
   application:
     name: pragmatic-ddd-ecommerce
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+
   datasource:
     url: jdbc:mysql://localhost:3306/ddd-pragmatic
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,3 +28,12 @@ spring:
     timeout: 30m
     jdbc:
         initialize-schema: always
+
+logging:
+  level:
+    com.sakai: TRACE
+
+jwt:
+  secret: your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm
+  access-token-expiration: 900000  # 15 minutos em milissegundos
+  refresh-token-expiration: 604800000  # 7 dias em milissegundos

@@ -3,7 +3,6 @@ package com.sakai.ecommerce.cart.infra.controller;
 import com.sakai.ecommerce.cart.application.dto.*;
 import com.sakai.ecommerce.cart.application.commands.*;
 import com.sakai.ecommerce.cart.application.handlers.*;
-import com.sakai.ecommerce.cart.application.queries.GetCartQuery;
 import com.sakai.ecommerce.cart.infra.requests.AddItemRequest;
 import com.sakai.ecommerce.cart.infra.requests.DecreaseItemQuantityRequest;
 import jakarta.servlet.http.HttpSession;
@@ -22,18 +21,11 @@ public class CartController {
     private final DecreaseCartItemQuantityHandler decreaseCartItemQuantityHandler;
     private final AddItemAndCheckoutHandler addItemAndCheckoutHandler;
     private final CheckoutHandler checkoutHandler;
-    private final AssignCartHandler assignCartHandler;
     private final GetCartHandler getCartHandler;
 
     @PostMapping("/items")
-    public void addItem(
-            @RequestHeader(value = "X-User-Id", required = false) UUID userId,
-            HttpSession session,
-            @RequestBody AddItemRequest request
-    ) {
+    public void addItem(@RequestBody AddItemRequest request) {
         var command = new AddItemToCartCommand(
-                userId,
-                session.getId(),
                 request.productId(),
                 request.sku(),
                 request.quantity()
@@ -43,14 +35,8 @@ public class CartController {
     }
 
     @PostMapping("/items/checkout")
-    public CartCheckoutResponse addItemAndCheckout(
-            @RequestHeader(value = "X-User-Id", required = false) UUID userId,
-            HttpSession session,
-            @RequestBody AddItemRequest request
-    ) {
+    public CartCheckoutResponse addItemAndCheckout(@RequestBody AddItemRequest request) {
         var command = new AddItemAndCheckoutCommand(
-                userId,
-                session.getId(),
                 request.productId(),
                 request.sku(),
                 request.quantity()
@@ -60,24 +46,14 @@ public class CartController {
     }
 
     @DeleteMapping("/items/{sku}")
-    public void removeItem(
-            @RequestHeader(value = "X-User-Id", required = false) UUID userId,
-            HttpSession session,
-            @PathVariable String sku
-    ) {
-        var command = new RemoveItemFromCartCommand(userId, session.getId(), sku);
+    public void removeItem(@PathVariable String sku) {
+        var command = new RemoveItemFromCartCommand(sku);
         removeCartItemHandler.removeItem(command);
     }
 
     @PatchMapping("/items/decrease")
-    public void decreaseItemQuantity(
-            @RequestHeader(value = "X-User-Id", required = false) UUID userId,
-            HttpSession session,
-            @RequestBody DecreaseItemQuantityRequest request
-    ) {
+    public void decreaseItemQuantity(@RequestBody DecreaseItemQuantityRequest request) {
         var command = new DecreaseItemQuantityCommand(
-                userId,
-                session.getId(),
                 request.sku(),
                 request.quantity()
         );
@@ -85,28 +61,12 @@ public class CartController {
     }
 
     @PostMapping("/checkout")
-    public void checkout(
-            @RequestHeader(value = "X-User-Id", required = false) UUID userId
-    ) {
-        var command = new CheckoutCommand(userId);
-        checkoutHandler.handle(command);
-    }
-
-    @PostMapping("/assign")
-    public void assignCart(
-            @RequestHeader(value = "X-User-Id") UUID userId,
-            HttpSession session
-    ) {
-        var command = new AssignCartCommand(userId, session.getId());
-        assignCartHandler.assign(command);
+    public void checkout() {
+        checkoutHandler.handle();
     }
 
     @GetMapping
-    public CartResponse getCart(
-            @RequestHeader(value = "X-User-Id", required = false) UUID userId,
-            HttpSession session
-    ) {
-        var query = new GetCartQuery(userId, session.getId());
-        return getCartHandler.handle(query);
+    public CartResponse getCart() {
+        return getCartHandler.handle();
     }
 }

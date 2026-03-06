@@ -167,44 +167,44 @@ class CartTest {
     }
 
     @Test
-    void shouldAddZeroQuantityItem() {
+    void shouldThrowWhenAddingItemWithZeroQuantity() {
         var cart = new Cart(UUID.randomUUID());
-        cart.addItem(UUID.randomUUID(), "SKU-001", 0, Money.of(100));
 
-        assertEquals(1, cart.getItems().size());
-        assertEquals(0, cart.getItems().getFirst().getQuantity());
+        assertThrows(IllegalArgumentException.class, () -> 
+            cart.addItem(UUID.randomUUID(), "SKU-001", 0, Money.of(100)));
     }
 
     @Test
-    void shouldRemoveNonExistentItemWithoutError() {
+    void shouldThrowWhenAddingItemWithNegativeQuantity() {
         var cart = new Cart(UUID.randomUUID());
-        cart.addItem(UUID.randomUUID(), "SKU-001", 1, Money.of(100));
 
-        cart.removeItem("SKU-999");
-
-        assertEquals(1, cart.getItems().size());
+        assertThrows(IllegalArgumentException.class, () -> 
+            cart.addItem(UUID.randomUUID(), "SKU-001", -1, Money.of(100)));
     }
 
     @Test
-    void shouldDecreaseByMoreThanAvailable() {
+    void shouldThrowWhenAddingItemWithNullPrice() {
         var cart = new Cart(UUID.randomUUID());
-        cart.addItem(UUID.randomUUID(), "SKU-001", 3, Money.of(100));
 
-        cart.decreaseItemQuantity("SKU-001", 10);
-
-        assertTrue(cart.getItems().isEmpty());
+        assertThrows(IllegalArgumentException.class, () -> 
+            cart.addItem(UUID.randomUUID(), "SKU-001", 1, null));
     }
 
     @Test
-    void shouldAssignAnonymousCartMultipleTimes() {
-        var cart = Cart.createAnonymous("session-123");
-        var customerId1 = UUID.randomUUID();
-        var customerId2 = UUID.randomUUID();
+    void shouldThrowWhenDecreasingWithZeroQuantity() {
+        var cart = new Cart(UUID.randomUUID());
+        cart.addItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
 
-        cart.assignToCustomer(customerId1);
-        cart.assignToCustomer(customerId2);
+        assertThrows(IllegalArgumentException.class, () -> 
+            cart.decreaseItemQuantity("SKU-001", 0));
+    }
 
-        assertEquals(customerId2, cart.getCustomerId());
-        assertNull(cart.getSessionId());
+    @Test
+    void shouldThrowWhenDecreasingWithNegativeQuantity() {
+        var cart = new Cart(UUID.randomUUID());
+        cart.addItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
+
+        assertThrows(IllegalArgumentException.class, () -> 
+            cart.decreaseItemQuantity("SKU-001", -1));
     }
 }

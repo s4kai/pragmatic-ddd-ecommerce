@@ -1,8 +1,8 @@
 package com.sakai.ecommerce.cart.application.handlers;
 
-import com.sakai.ecommerce.cart.application.commands.CheckoutCommand;
 import com.sakai.ecommerce.cart.domain.Cart;
 import com.sakai.ecommerce.cart.domain.CartRepository;
+import com.sakai.ecommerce.shared.application.security.AuthenticationContext;
 import com.sakai.ecommerce.shared.application.services.EventPublisher;
 import com.sakai.ecommerce.shared.domain.Money;
 import com.sakai.ecommerce.shared.domain.exception.BusinessError;
@@ -27,6 +27,9 @@ class CheckoutHandlerTest {
     @Mock
     private EventPublisher eventPublisher;
 
+    @Mock
+    private AuthenticationContext authenticationContext;
+
     @InjectMocks
     private CheckoutHandler handler;
 
@@ -35,11 +38,11 @@ class CheckoutHandlerTest {
         var customerId = UUID.randomUUID();
         var cart = new Cart(customerId);
         cart.addItem(UUID.randomUUID(), "SKU-001", 1, Money.of(100));
-        var command = new CheckoutCommand(customerId);
 
+        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.of(cart));
 
-        handler.handle(command);
+        handler.handle();
 
         verify(cartRepository).save(cart);
         verify(eventPublisher).publish(cart);
@@ -48,33 +51,22 @@ class CheckoutHandlerTest {
     @Test
     void shouldThrowWhenCartNotFound() {
         var customerId = UUID.randomUUID();
-        var command = new CheckoutCommand(customerId);
 
+        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
 
-        assertThrows(BusinessError.class, () -> handler.handle(command));
-    }
-
-    @Test
-    void shouldNotPublishEventsWhenCheckoutFails() {
-        var customerId = UUID.randomUUID();
-        var cart = new Cart(customerId);
-        var command = new CheckoutCommand(customerId);
-
-        when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.of(cart));
-
-        assertThrows(BusinessError.class, () -> handler.handle(command));
-        verify(eventPublisher, never()).publish(any());
+        assertThrows(BusinessError.class, () -> handler.handle());
     }
 
     @Test
     void shouldThrowWhenCheckoutEmptyCart() {
         var customerId = UUID.randomUUID();
         var cart = new Cart(customerId);
-        var command = new CheckoutCommand(customerId);
 
+        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.of(cart));
 
-        assertThrows(BusinessError.class, () -> handler.handle(command));
+        assertThrows(BusinessError.class, () -> handler.handle());
+        verify(eventPublisher, never()).publish(any());
     }
 }

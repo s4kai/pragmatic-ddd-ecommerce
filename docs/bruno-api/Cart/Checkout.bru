@@ -1,0 +1,15 @@
+meta {
+  name: Checkout
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/cart/checkout
+  body: none
+  auth: none
+}
+
+headers {
+  X-User-Id: {{userId}}
+}

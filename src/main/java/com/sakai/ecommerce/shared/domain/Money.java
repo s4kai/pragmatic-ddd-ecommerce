@@ -60,6 +60,10 @@ public class Money {
     public Money multiply(BigDecimal multiplier) {
         return new Money(amount.multiply(multiplier), currency);
     }
+    
+    public boolean isNegative() {
+        return amount.compareTo(BigDecimal.ZERO) < 0;
+    }
 
     public static Money of(Integer amount){
         try{

@@ -4,6 +4,7 @@ import com.sakai.ecommerce.cart.application.CartRetriever;
 import com.sakai.ecommerce.cart.application.commands.DecreaseItemQuantityCommand;
 import com.sakai.ecommerce.cart.domain.Cart;
 import com.sakai.ecommerce.cart.domain.CartRepository;
+import com.sakai.ecommerce.shared.application.services.EventPublisher;
 import com.sakai.ecommerce.shared.domain.Money;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,65 +26,38 @@ class DecreaseCartItemQuantityHandlerTest {
     @Mock
     private CartRetriever cartRetriever;
 
+    @Mock
+    private EventPublisher eventPublisher;
+
     @InjectMocks
     private DecreaseCartItemQuantityHandler handler;
 
     @Test
     void shouldDecreaseItemQuantity() {
-        var customerId = UUID.randomUUID();
-        var cart = new Cart(customerId);
+        var cart = new Cart(UUID.randomUUID());
         cart.addItem(UUID.randomUUID(), "SKU-001", 5, Money.of(100));
-        var command = new DecreaseItemQuantityCommand(customerId, null, "SKU-001", 2);
+        var command = new DecreaseItemQuantityCommand("SKU-001", 2);
 
-        when(cartRetriever.getCart(customerId, null)).thenReturn(cart);
+        when(cartRetriever.getCart()).thenReturn(cart);
 
         handler.decreaseQuantity(command);
 
         verify(cartRepository).save(cart);
+        verify(eventPublisher).publish(cart);
     }
 
     @Test
     void shouldRemoveItemWhenQuantityReachesZero() {
-        var customerId = UUID.randomUUID();
-        var cart = new Cart(customerId);
+        var cart = new Cart(UUID.randomUUID());
         cart.addItem(UUID.randomUUID(), "SKU-001", 2, Money.of(100));
-        var command = new DecreaseItemQuantityCommand(customerId, null, "SKU-001", 2);
+        var command = new DecreaseItemQuantityCommand("SKU-001", 2);
 
-        when(cartRetriever.getCart(customerId, null)).thenReturn(cart);
-
-        handler.decreaseQuantity(command);
-
-        verify(cartRepository).save(cart);
-        assertTrue(cart.getItems().isEmpty());
-    }
-
-    @Test
-    void shouldDecreaseInAnonymousCart() {
-        var sessionId = "session-123";
-        var cart = Cart.createAnonymous(sessionId);
-        cart.addItem(UUID.randomUUID(), "SKU-001", 10, Money.of(50));
-        var command = new DecreaseItemQuantityCommand(null, sessionId, "SKU-001", 3);
-
-        when(cartRetriever.getCart(null, sessionId)).thenReturn(cart);
+        when(cartRetriever.getCart()).thenReturn(cart);
 
         handler.decreaseQuantity(command);
 
         verify(cartRepository).save(cart);
-        assertEquals(7, cart.getItems().getFirst().getQuantity());
-    }
-
-    @Test
-    void shouldRemoveItemWhenDecreasingByMoreThanAvailable() {
-        var customerId = UUID.randomUUID();
-        var cart = new Cart(customerId);
-        cart.addItem(UUID.randomUUID(), "SKU-001", 3, Money.of(100));
-        var command = new DecreaseItemQuantityCommand(customerId, null, "SKU-001", 10);
-
-        when(cartRetriever.getCart(customerId, null)).thenReturn(cart);
-
-        handler.decreaseQuantity(command);
-
-        verify(cartRepository).save(cart);
+        verify(eventPublisher).publish(cart);
         assertTrue(cart.getItems().isEmpty());
     }
 }
