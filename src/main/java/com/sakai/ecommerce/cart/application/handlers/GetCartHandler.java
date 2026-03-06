@@ -2,7 +2,6 @@ package com.sakai.ecommerce.cart.application.handlers;
 
 import com.sakai.ecommerce.cart.application.CartRetriever;
 import com.sakai.ecommerce.cart.application.dto.CartResponse;
-import com.sakai.ecommerce.cart.application.queries.GetCartQuery;
 import com.sakai.ecommerce.cart.domain.CartItem;
 import com.sakai.ecommerce.catalog.ProductInfoService;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +13,8 @@ public class GetCartHandler {
     private final CartRetriever cartRetriever;
     private final ProductInfoService productInfoService;
 
-    public CartResponse handle(GetCartQuery query) {
-        var cart = cartRetriever.getCart(query.userId(), query.sessionId());
+    public CartResponse handle() {
+        var cart = cartRetriever.getCart();
 
         var items = cart.getItems()
                 .stream()

@@ -2,6 +2,8 @@ package com.sakai.ecommerce.cart.application;
 
 import com.sakai.ecommerce.cart.domain.Cart;
 import com.sakai.ecommerce.cart.domain.CartRepository;
+import com.sakai.ecommerce.shared.application.security.AuthenticationContext;
+import com.sakai.ecommerce.shared.application.security.SessionContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,20 +13,37 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CartRetriever {
     private final CartRepository cartRepository;
+
+    private final AuthenticationContext authenticationContext;
+    private final SessionContext sessionContext;
     
-    public Cart getCart(UUID customerId, String sessionId) {
+    public Cart getCart() {
+        var customerId = authenticationContext.getCurrentUserId();
+        var sessionId = sessionContext.getCurrentSessionId();
+        
         if (customerId != null) {
-            return cartRepository
-                    .findByCustomerId(customerId)
-                    .orElse(new Cart(customerId));
+            return getAuthenticatedUserCart(customerId, sessionId);
         }
 
-        if (sessionId != null) {
-            return cartRepository
-                    .findBySessionId(sessionId)
-                    .orElse(Cart.createAnonymous(sessionId));
-        }
+        return getAnonymousCart(sessionId);
+    }
 
-        throw new IllegalArgumentException("customerId ou sessionId obrigatório");
+    private Cart getAuthenticatedUserCart(UUID customerId, String sessionId) {
+        return cartRepository.findByCustomerId(customerId)
+                .orElseGet(() -> convertAnonymousCartOrCreateNew(customerId, sessionId));
+    }
+
+    private Cart convertAnonymousCartOrCreateNew(UUID customerId, String sessionId) {
+        return cartRepository.findBySessionId(sessionId)
+                .map(cart -> {
+                    cart.assignToCustomer(customerId);
+                    return cart;
+                })
+                .orElseGet(() -> new Cart(customerId));
+    }
+
+    private Cart getAnonymousCart(String sessionId) {
+        return cartRepository.findBySessionId(sessionId)
+                .orElseGet(() -> Cart.createAnonymous(sessionId));
     }
 }
