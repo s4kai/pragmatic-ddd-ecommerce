@@ -15,7 +15,6 @@ import com.sakai.ecommerce.auth.infra.requests.RegisterRequest;
 import com.sakai.ecommerce.shared.application.security.AuthenticationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

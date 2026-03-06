@@ -12,6 +12,8 @@ public class LogoutHandler {
     private final UserRepository userRepository;
 
     public void handler(LogoutCommand command){
+        if(command.userId() == null) return;
+
         var user = userRepository.findById(command.userId())
                 .orElseThrow(InvalidCredentials::new);
 
