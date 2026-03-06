@@ -4,9 +4,9 @@ import com.sakai.ecommerce.catalog.application.dto.ProductDimensionsDTO;
 
 import java.util.List;
 
-public record CreateProductWithVariantsCommand(
+public record CreateProductCommand(
         String name,
         String description,
         ProductDimensionsDTO dimensions,
-        List<CreateVariantCommand> variants
+        List<CreateVariantDataCommand> variants
 ) {}
