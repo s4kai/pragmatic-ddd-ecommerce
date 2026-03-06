@@ -7,9 +7,9 @@ meta {
 delete {
   url: {{baseUrl}}/cart/items/SKU-001
   body: none
-  auth: none
+  auth: bearer
 }
 
-headers {
-  X-User-Id: {{userId}}
+auth:bearer {
+  token: {{accessToken}}
 }

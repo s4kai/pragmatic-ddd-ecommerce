@@ -22,6 +22,7 @@ public class CartController {
     private final AddItemAndCheckoutHandler addItemAndCheckoutHandler;
     private final CheckoutHandler checkoutHandler;
     private final GetCartHandler getCartHandler;
+    private final ClearCartHandler clearCartHandler;
 
     @PostMapping("/items")
     public void addItem(@RequestBody AddItemRequest request) {
@@ -69,4 +70,7 @@ public class CartController {
     public CartResponse getCart() {
         return getCartHandler.handle();
     }
+
+    @PostMapping("/clear")
+    public void clearCart() { clearCartHandler.handle();}
 }

@@ -7,9 +7,9 @@ meta {
 post {
   url: {{baseUrl}}/cart/checkout
   body: none
-  auth: none
+  auth: bearer
 }
 
-headers {
-  X-User-Id: {{userId}}
+auth:bearer {
+  token: {{accessToken}}
 }

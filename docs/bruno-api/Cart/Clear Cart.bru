@@ -1,0 +1,20 @@
+meta {
+  name: Clear Cart
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/cart/clear
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

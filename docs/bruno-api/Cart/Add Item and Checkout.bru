@@ -7,11 +7,11 @@ meta {
 post {
   url: {{baseUrl}}/cart/items/checkout
   body: json
-  auth: none
+  auth: bearer
 }
 
-headers {
-  X-User-Id: {{userId}}
+auth:bearer {
+  token: {{accessToken}}
 }
 
 body:json {

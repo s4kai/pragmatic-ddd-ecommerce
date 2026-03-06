@@ -110,4 +110,16 @@ public class Cart extends AggregateRoot<UUID> {
                 .map(CartItem::getSubtotal)
                 .reduce(Money.ZERO, Money::add);
     }
+
+    public void clear() {
+        if(items.isEmpty()){
+            throw new BusinessError("O carrinho já está vazio");
+        }
+
+        if(this.status != CartStatus.ACTIVE){
+            throw new BusinessError("Não é possível limpar um carrinho que não está ativo");
+        }
+
+        items.clear();
+    }
 }
