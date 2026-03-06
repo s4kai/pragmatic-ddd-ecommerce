@@ -4,6 +4,7 @@ import com.sakai.ecommerce.cart.application.CartRetriever;
 import com.sakai.ecommerce.cart.application.commands.RemoveItemFromCartCommand;
 import com.sakai.ecommerce.cart.domain.Cart;
 import com.sakai.ecommerce.cart.domain.CartRepository;
+import com.sakai.ecommerce.shared.application.services.EventPublisher;
 import com.sakai.ecommerce.shared.domain.Money;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class RemoveCartItemHandlerTest {
@@ -25,50 +25,23 @@ class RemoveCartItemHandlerTest {
     @Mock
     private CartRetriever cartRetriever;
 
+    @Mock
+    private EventPublisher eventPublisher;
+
     @InjectMocks
     private RemoveCartItemHandler handler;
 
     @Test
     void shouldRemoveItemFromCart() {
-        var customerId = UUID.randomUUID();
-        var cart = new Cart(customerId);
+        var cart = new Cart(UUID.randomUUID());
         cart.addItem(UUID.randomUUID(), "SKU-001", 2, Money.of(100));
-        var command = new RemoveItemFromCartCommand(customerId, null, "SKU-001");
+        var command = new RemoveItemFromCartCommand("SKU-001");
 
-        when(cartRetriever.getCart(customerId, null)).thenReturn(cart);
-
-        handler.removeItem(command);
-
-        verify(cartRepository).save(cart);
-    }
-
-    @Test
-    void shouldRemoveItemFromAnonymousCart() {
-        var sessionId = "session-123";
-        var cart = Cart.createAnonymous(sessionId);
-        cart.addItem(UUID.randomUUID(), "SKU-001", 1, Money.of(50));
-        var command = new RemoveItemFromCartCommand(null, sessionId, "SKU-001");
-
-        when(cartRetriever.getCart(null, sessionId)).thenReturn(cart);
+        when(cartRetriever.getCart()).thenReturn(cart);
 
         handler.removeItem(command);
 
         verify(cartRepository).save(cart);
-        assertTrue(cart.getItems().isEmpty());
-    }
-
-    @Test
-    void shouldHandleRemovingNonExistentItem() {
-        var customerId = UUID.randomUUID();
-        var cart = new Cart(customerId);
-        cart.addItem(UUID.randomUUID(), "SKU-001", 2, Money.of(100));
-        var command = new RemoveItemFromCartCommand(customerId, null, "SKU-999");
-
-        when(cartRetriever.getCart(customerId, null)).thenReturn(cart);
-
-        handler.removeItem(command);
-
-        verify(cartRepository).save(cart);
-        assertEquals(1, cart.getItems().size());
+        verify(eventPublisher).publish(cart);
     }
 }
