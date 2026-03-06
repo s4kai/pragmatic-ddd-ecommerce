@@ -2,7 +2,6 @@ package com.sakai.ecommerce.catalog.application;
 
 import com.sakai.ecommerce.catalog.domain.ProductVariant;
 import com.sakai.ecommerce.shared.application.services.StorageService;
-import com.sakai.ecommerce.shared.domain.core.BaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +37,7 @@ public class ProductCleanupService {
                 .map(ProductVariant::getGallery)
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
-                .map(BaseEntity::getId)
+                .filter(Objects::nonNull)
                 .forEach(files::add);
 
         return files;
