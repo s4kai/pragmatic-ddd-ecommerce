@@ -21,6 +21,9 @@ public class Cart extends AggregateRoot<UUID> {
     @Enumerated(EnumType.STRING)
     private CartStatus status;
 
+    @Version
+    private Long version;
+
     @JoinColumn(name = "cart_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<CartItem> items = new ArrayList<>();
@@ -46,6 +49,9 @@ public class Cart extends AggregateRoot<UUID> {
     }
 
     public void addItem(UUID productId, String sku, int quantity, Money unitPrice) {
+        if (quantity <= 0) throw new IllegalArgumentException("Quantidade deve ser maior que zero");
+        if (unitPrice == null || unitPrice.isNegative()) throw new IllegalArgumentException("Preço inválido");
+        
         var existing = items.stream()
                 .filter(i -> i.getSku().equals(sku))
                 .findFirst();
@@ -64,6 +70,8 @@ public class Cart extends AggregateRoot<UUID> {
     }
     
     public void decreaseItemQuantity(String sku, int quantity) {
+        if (quantity <= 0) throw new IllegalArgumentException("Quantidade deve ser maior que zero");
+        
         var item = items.stream()
                 .filter(i -> i.getSku().equals(sku))
                 .findFirst()
@@ -77,6 +85,10 @@ public class Cart extends AggregateRoot<UUID> {
     }
 
     public void initiateCheckout() {
+        if (this.status == CartStatus.CHECKED_OUT) {
+            throw new BusinessError("Carrinho já foi finalizado");
+        }
+        
         if (this.status != CartStatus.ACTIVE) {
             throw new BusinessError("Não é possível iniciar o checkout de um carrinho que não está ativo");
         }

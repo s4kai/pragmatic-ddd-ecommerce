@@ -21,6 +21,9 @@ public class CartItem extends BaseEntity<UUID> {
     private Money unitPrice;
 
     public CartItem(UUID productId, String sku, int quantity, Money unitPrice) {
+        if (quantity <= 0) throw new IllegalArgumentException("Quantidade deve ser maior que zero");
+        if (unitPrice == null || unitPrice.isNegative()) throw new IllegalArgumentException("Preço inválido");
+        
         this.id = UUID.randomUUID();
         this.productId = productId;
         this.sku = sku;
@@ -29,10 +32,12 @@ public class CartItem extends BaseEntity<UUID> {
     }
 
     public void increaseQuantity(int amount) {
+        if (amount <= 0) throw new IllegalArgumentException("Quantidade deve ser maior que zero");
         this.quantity += amount;
     }
 
     public void decreaseQuantity(int amount) {
+        if (amount <= 0) throw new IllegalArgumentException("Quantidade deve ser maior que zero");
         this.quantity = Math.max(0, this.quantity - amount);
     }
 
