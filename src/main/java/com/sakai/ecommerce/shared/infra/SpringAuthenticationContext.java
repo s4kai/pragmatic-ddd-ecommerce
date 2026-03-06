@@ -54,7 +54,7 @@ public class SpringAuthenticationContext implements AuthenticationContext {
     private Authentication getAuthentication() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            throw new IllegalStateException("Usuário não autenticado");
+            throw new com.sakai.ecommerce.auth.domain.exceptions.UnauthorizedException("Usuário não autenticado");
         }
         return auth;
     }
