@@ -1,6 +1,7 @@
 package com.sakai.ecommerce.shared.infra;
 
 import com.sakai.ecommerce.auth.domain.Role;
+import com.sakai.ecommerce.auth.domain.exceptions.UnauthorizedException;
 import com.sakai.ecommerce.shared.application.security.AuthenticationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,7 +55,7 @@ public class SpringAuthenticationContext implements AuthenticationContext {
     private Authentication getAuthentication() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            throw new com.sakai.ecommerce.auth.domain.exceptions.UnauthorizedException("Usuário não autenticado");
+            throw new UnauthorizedException("Usuário não autenticado");
         }
         return auth;
     }
