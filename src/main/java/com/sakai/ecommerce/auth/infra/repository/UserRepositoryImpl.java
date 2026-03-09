@@ -36,8 +36,4 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<User> findByEmail(String email) {
         return jpaUserRepository.findByEmail(email);
     }
-    @Override
-    public Optional<User> findByEmailToken(String emailToken) {
-        return jpaUserRepository.findByEmailVerificationToken(emailToken);
-    }
 }

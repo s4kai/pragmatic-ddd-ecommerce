@@ -27,7 +27,7 @@ spring:
     store-type: jdbc
     timeout: 30m
     jdbc:
-        initialize-schema: always
+      initialize-schema: embedded
 
 logging:
   level:

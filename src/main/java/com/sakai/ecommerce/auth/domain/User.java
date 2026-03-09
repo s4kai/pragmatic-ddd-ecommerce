@@ -15,8 +15,7 @@ import java.util.UUID;
 @Entity
 @Getter
 public class User extends AggregateRoot<UUID> {
-    private final static int MAX_LOGIN_ATTEMPT = 5;
-    private final static int EMAIL_VERIFICATION_TIME = 60 * 60; // 1h
+    private static final int MAX_LOGIN_ATTEMPT = 5;
 
     private String email;
     private String password;
@@ -29,16 +28,7 @@ public class User extends AggregateRoot<UUID> {
     @Column(nullable = false)
     private AccountStatus status = AccountStatus.PENDING_VERIFICATION;
 
-    private boolean emailVerified = false;
-
-    private String emailVerificationToken;
-    private Instant emailVerificationTokenExpiry;
-
-    private String passwordResetToken;
-    private Instant passwordResetTokenExpiry;
-
     private int failedLoginAttempts = 0;
-
     private String refreshToken;
     private Instant lockedUntil;
     private Instant lastLoginAt;
@@ -49,7 +39,7 @@ public class User extends AggregateRoot<UUID> {
     private Long version;
 
     public static User createLocalUser(String email, String password){
-        User.validateLocalUser(email, password);
+        validateLocalUser(email, password);
 
         var user = new User();
         user.id = UUID.randomUUID();
@@ -57,8 +47,6 @@ public class User extends AggregateRoot<UUID> {
         user.password = password;
         user.roles = List.of(Role.CUSTOMER);
         user.status = AccountStatus.PENDING_VERIFICATION;
-
-        user.generateEmailVerificationToken();
         user.registerEvent(new UserRegisteredEvent(user.getId(), user.getEmail()));
 
         return user;
@@ -70,42 +58,22 @@ public class User extends AggregateRoot<UUID> {
         if (password == null || password.isBlank()) throw new BusinessError("Password cannot be null or blank");
     }
 
-    public void generateEmailVerificationToken() {
-        String verificationToken = UUID.randomUUID().toString();
-        Instant expiry = Instant.now().plusSeconds(EMAIL_VERIFICATION_TIME);
-
-        this.emailVerificationToken = verificationToken;
-        this.emailVerificationTokenExpiry = expiry;
-    }
-
-    public void verifyEmail(String token) {
-        if (!token.equals(this.emailVerificationToken))
-            throw new BusinessError("Invalid token");
-
-        if (Instant.now().isAfter(this.emailVerificationTokenExpiry))
-            throw new BusinessError("Token expired");
-
-        this.emailVerified = true;
+    public void activateAccount() {
         this.status = AccountStatus.ACTIVE;
-        this.emailVerificationToken = null;
-        this.emailVerificationTokenExpiry = null;
     }
 
     public boolean loginAttempt(boolean passwordIsValid) {
-        if (this.isAccountLocked()) return false;
-        if (this.status != AccountStatus.ACTIVE) return false;
+        if (isAccountLocked()) return false;
+        if (status != AccountStatus.ACTIVE) return false;
+        if (!passwordIsValid) return false;
 
-        if(!passwordIsValid) return false;
-
-        this.recordSuccessfulLogin();
-        this.registerEvent(new UserAuthenticatedEvent(this.getId(), this.getEmail()));
+        recordSuccessfulLogin();
+        registerEvent(new UserAuthenticatedEvent(getId(), getEmail()));
         return true;
     }
 
-    public void revokeAllTokens(){
+    public void revokeRefreshToken() {
         this.refreshToken = null;
-        this.emailVerificationToken = null;
-        this.passwordResetToken = null;
     }
 
     public void updateRefreshToken(String refreshToken) {
@@ -114,19 +82,18 @@ public class User extends AggregateRoot<UUID> {
 
     public void recordFailedLogin() {
         this.failedLoginAttempts++;
-        if (this.failedLoginAttempts >= MAX_LOGIN_ATTEMPT) lockAccount();
+        if (failedLoginAttempts >= MAX_LOGIN_ATTEMPT) lockAccount();
     }
 
-    private void lockAccount(){
+    private void lockAccount() {
         this.status = AccountStatus.LOCKED;
         this.lockedUntil = Instant.now().plusSeconds(900); // 15 min
-
     }
 
-    public void resetPassword(String newPassword) {
+    public void updatePassword(String newPassword) {
+        if (newPassword == null || newPassword.isBlank())
+            throw new BusinessError("Password cannot be null or blank");
         this.password = newPassword;
-        this.passwordResetToken = null;
-        this.passwordResetTokenExpiry = null;
     }
 
     private void recordSuccessfulLogin() {
@@ -135,11 +102,11 @@ public class User extends AggregateRoot<UUID> {
         this.lockedUntil = null;
     }
 
-    public void logout(){
-        this.revokeAllTokens();
+    public void logout() {
+        revokeRefreshToken();
     }
 
-    public void delete(){
+    public void delete() {
         this.status = AccountStatus.TEMP_DELETED;
     }
 

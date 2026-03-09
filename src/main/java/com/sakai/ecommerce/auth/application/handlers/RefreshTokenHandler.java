@@ -46,11 +46,11 @@ public class RefreshTokenHandler {
     }
 
     private boolean isRefreshTokenMismatch(User user, String sentRefreshToken) {
-        return user == null || !user.getRefreshToken().equals(sentRefreshToken);
+        return user.getRefreshToken() == null || !user.getRefreshToken().equals(sentRefreshToken);
     }
 
     private void revokeUserTokens(User user) {
-        user.revokeAllTokens();
+        user.revokeRefreshToken();
         userRepository.save(user);
     }
 }

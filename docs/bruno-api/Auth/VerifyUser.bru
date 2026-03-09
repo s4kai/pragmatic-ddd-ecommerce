@@ -1,0 +1,15 @@
+meta {
+  name: VerifyUser
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/auth/email/verification/{{emailToken}}
+  body: json
+  auth: none
+}
+
+vars:pre-request {
+  emailToken: d5758477-0355-45bc-ab42-ebbabe6f4d65
+}
