@@ -7,7 +7,6 @@ import com.sakai.ecommerce.auth.application.services.TokenService;
 import com.sakai.ecommerce.auth.domain.User;
 import com.sakai.ecommerce.auth.domain.UserRepository;
 import com.sakai.ecommerce.auth.domain.exceptions.InvalidCredentials;
-import com.sakai.ecommerce.shared.domain.exception.BusinessError;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,17 +33,9 @@ public class AuthenticateHandler {
             user.getPassword()
         );
 
-        if (!isPasswordValid) {
-            log.warn("Invalid password for user {}", user.getId());
-            user.recordFailedLogin();
-            userRepository.save(user);
-            throw new InvalidCredentials();
-        }
+        boolean validLogin = user.loginAttempt(isPasswordValid);
 
-        boolean isLogged = user.loginAttempt(user.getPassword());
-
-        if (!isLogged) {
-            log.warn("Failed login attempt for user {}", user.getId());
+        if (!validLogin) {
             user.recordFailedLogin();
             userRepository.save(user);
             throw new InvalidCredentials();

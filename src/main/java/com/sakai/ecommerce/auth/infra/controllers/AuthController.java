@@ -1,14 +1,8 @@
 package com.sakai.ecommerce.auth.infra.controllers;
 
-import com.sakai.ecommerce.auth.application.commands.AuthenticateCommand;
-import com.sakai.ecommerce.auth.application.commands.LogoutCommand;
-import com.sakai.ecommerce.auth.application.commands.RefreshTokenCommand;
-import com.sakai.ecommerce.auth.application.commands.RegisterUserCommand;
+import com.sakai.ecommerce.auth.application.commands.*;
 import com.sakai.ecommerce.auth.application.dto.AuthResponse;
-import com.sakai.ecommerce.auth.application.handlers.AuthenticateHandler;
-import com.sakai.ecommerce.auth.application.handlers.LogoutHandler;
-import com.sakai.ecommerce.auth.application.handlers.RefreshTokenHandler;
-import com.sakai.ecommerce.auth.application.handlers.RegisterUserHandler;
+import com.sakai.ecommerce.auth.application.handlers.*;
 import com.sakai.ecommerce.auth.infra.requests.LoginRequest;
 import com.sakai.ecommerce.auth.infra.requests.RefreshTokenRequest;
 import com.sakai.ecommerce.auth.infra.requests.RegisterRequest;
@@ -26,6 +20,7 @@ public class AuthController {
     private final RefreshTokenHandler refreshTokenHandler;
     private final LogoutHandler logoutHandler;
     private final AuthenticationContext authenticationContext;
+    private final VerifyEmailHandler verifyEmailHandler;
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterRequest request) {
@@ -50,5 +45,12 @@ public class AuthController {
         logoutHandler.handler(new LogoutCommand(authenticationContext.getCurrentUserId()));
         authenticationContext.clearContext();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/email/verification/{token}")
+    public ResponseEntity<Void> verifyEmail (@PathVariable String token) {
+        var command = new VerifyEmailCommand(token);
+        verifyEmailHandler.handle(command);
+        return ResponseEntity.ok().build();
     }
 }

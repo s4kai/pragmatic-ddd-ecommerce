@@ -13,7 +13,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CartRetriever {
     private final CartRepository cartRepository;
-
     private final AuthenticationContext authenticationContext;
     private final SessionContext sessionContext;
     

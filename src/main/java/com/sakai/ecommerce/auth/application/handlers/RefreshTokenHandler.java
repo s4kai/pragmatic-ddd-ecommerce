@@ -46,7 +46,7 @@ public class RefreshTokenHandler {
     }
 
     private boolean isRefreshTokenMismatch(User user, String sentRefreshToken) {
-        return !user.getRefreshToken().equals(sentRefreshToken);
+        return user == null || !user.getRefreshToken().equals(sentRefreshToken);
     }
 
     private void revokeUserTokens(User user) {

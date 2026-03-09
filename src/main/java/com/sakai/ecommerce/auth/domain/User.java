@@ -91,11 +91,11 @@ public class User extends AggregateRoot<UUID> {
         this.emailVerificationTokenExpiry = null;
     }
 
-    public boolean loginAttempt(String hashPassword) {
+    public boolean loginAttempt(boolean passwordIsValid) {
         if (this.isAccountLocked()) return false;
         if (this.status != AccountStatus.ACTIVE) return false;
 
-        if(hashPassword != null && !this.password.equals(hashPassword)) return false;
+        if(!passwordIsValid) return false;
 
         this.recordSuccessfulLogin();
         this.registerEvent(new UserAuthenticatedEvent(this.getId(), this.getEmail()));
