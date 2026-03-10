@@ -20,10 +20,17 @@ public class SpringSessionContext implements SessionContext {
             return null;
         }
 
-        boolean hasToCreateSession = !context.isAuthenticated();
+        var session = attributes.getRequest().getSession(false);
+        if (session != null) {
+            return session.getId();
+        }
 
-        var session = attributes.getRequest().getSession(hasToCreateSession);
-        return session.getId();
+        if (!context.isAuthenticated()) {
+            session = attributes.getRequest().getSession(true);
+            return session.getId();
+        }
+
+        return null;
     }
 
     @Override
