@@ -9,7 +9,7 @@ spring:
       max-request-size: 100MB
 
   datasource:
-    url: jdbc:mysql://localhost:3306/ddd-pragmatic
+    url: jdbc:mysql://127.0.0.1:3306/ddd-pragmatic?allowPublicKeyRetrieval=true&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password:
@@ -27,7 +27,8 @@ spring:
     store-type: jdbc
     timeout: 30m
     jdbc:
-      initialize-schema: embedded
+      initialize-schema: always
+
 
 logging:
   level:
