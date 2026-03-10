@@ -7,7 +7,7 @@ meta {
 get {
   url: {{baseUrl}}/products?name=&description=&page=0&size=20
   body: none
-  auth: none
+  auth: bearer
 }
 
 params:query {
@@ -15,4 +15,8 @@ params:query {
   description: 
   page: 0
   size: 20
+}
+
+auth:bearer {
+  token: {{accessToken}}
 }
