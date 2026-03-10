@@ -16,7 +16,10 @@ public class CheckoutHandler {
     private final AuthenticationContext authenticationContext;
 
     public void handle() {
-       Cart cart = cartRepository.findByCustomerId(authenticationContext.getCurrentUserId())
+        var customerId = authenticationContext.getCurrentUserId()
+                .orElseThrow(() -> new BusinessError("User not authenticated"));
+
+       Cart cart = cartRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new BusinessError("Cart not found"));
 
         cart.initiateCheckout();

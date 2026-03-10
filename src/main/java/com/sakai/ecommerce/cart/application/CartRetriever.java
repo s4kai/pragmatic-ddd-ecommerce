@@ -5,6 +5,8 @@ import com.sakai.ecommerce.cart.domain.CartRepository;
 import com.sakai.ecommerce.shared.application.security.AuthenticationContext;
 import com.sakai.ecommerce.shared.application.security.SessionContext;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -17,7 +19,7 @@ public class CartRetriever {
     private final SessionContext sessionContext;
     
     public Cart getCart() {
-        var customerId = authenticationContext.getCurrentUserId();
+        var customerId = authenticationContext.getCurrentUserId().orElse(null);
         var sessionId = sessionContext.getCurrentSessionId();
         
         if (customerId != null) {
