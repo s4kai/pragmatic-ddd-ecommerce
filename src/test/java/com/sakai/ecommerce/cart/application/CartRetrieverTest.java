@@ -36,7 +36,7 @@ class CartRetrieverTest {
         var customerId = UUID.randomUUID();
         var cart = new Cart(customerId);
         
-        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
+        when(authenticationContext.getCurrentUserId()).thenReturn(Optional.of(customerId));
         when(sessionContext.getCurrentSessionId()).thenReturn("session");
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.of(cart));
 
@@ -50,7 +50,7 @@ class CartRetrieverTest {
         var customerId = UUID.randomUUID();
         var sessionId = "session-123";
         
-        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
+        when(authenticationContext.getCurrentUserId()).thenReturn(Optional.of(customerId));
         when(sessionContext.getCurrentSessionId()).thenReturn(sessionId);
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
         when(cartRepository.findBySessionId(sessionId)).thenReturn(Optional.empty());
@@ -81,7 +81,7 @@ class CartRetrieverTest {
         var sessionId = "session-123";
         var anonymousCart = Cart.createAnonymous(sessionId);
         
-        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
+        when(authenticationContext.getCurrentUserId()).thenReturn(Optional.of(customerId));
         when(sessionContext.getCurrentSessionId()).thenReturn(sessionId);
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
         when(cartRepository.findBySessionId(sessionId)).thenReturn(Optional.of(anonymousCart));

@@ -39,7 +39,7 @@ class CheckoutHandlerTest {
         var cart = new Cart(customerId);
         cart.addItem(UUID.randomUUID(), "SKU-001", 1, Money.of(100));
 
-        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
+        when(authenticationContext.getCurrentUserId()).thenReturn(Optional.of(customerId));
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.of(cart));
 
         handler.handle();
@@ -52,7 +52,7 @@ class CheckoutHandlerTest {
     void shouldThrowWhenCartNotFound() {
         var customerId = UUID.randomUUID();
 
-        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
+        when(authenticationContext.getCurrentUserId()).thenReturn(Optional.of(customerId));
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.empty());
 
         assertThrows(BusinessError.class, () -> handler.handle());
@@ -63,7 +63,7 @@ class CheckoutHandlerTest {
         var customerId = UUID.randomUUID();
         var cart = new Cart(customerId);
 
-        when(authenticationContext.getCurrentUserId()).thenReturn(customerId);
+        when(authenticationContext.getCurrentUserId()).thenReturn(Optional.of(customerId));
         when(cartRepository.findByCustomerId(customerId)).thenReturn(Optional.of(cart));
 
         assertThrows(BusinessError.class, () -> handler.handle());
