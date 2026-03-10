@@ -63,9 +63,14 @@ public class User extends AggregateRoot<UUID> {
     }
 
     public boolean loginAttempt(boolean passwordIsValid) {
-        if (isAccountLocked()) return false;
-        if (status != AccountStatus.ACTIVE) return false;
-        if (!passwordIsValid) return false;
+        boolean isInactive = !isAccountActive();
+        boolean isLocked = isAccountLocked();
+        boolean passwordInvalid = !passwordIsValid;
+
+        if (isInactive || isLocked || passwordInvalid) {
+            recordFailedLogin();
+            return false;
+        };
 
         recordSuccessfulLogin();
         registerEvent(new UserAuthenticatedEvent(getId(), getEmail()));
@@ -119,6 +124,10 @@ public class User extends AggregateRoot<UUID> {
             this.lockedUntil = null;
         }
         return false;
+    }
+
+    public boolean isAccountActive(){
+        return status == AccountStatus.ACTIVE;
     }
 
 }
