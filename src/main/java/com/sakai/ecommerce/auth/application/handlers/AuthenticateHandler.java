@@ -7,6 +7,7 @@ import com.sakai.ecommerce.auth.application.services.TokenService;
 import com.sakai.ecommerce.auth.domain.User;
 import com.sakai.ecommerce.auth.domain.UserRepository;
 import com.sakai.ecommerce.auth.domain.exceptions.InvalidCredentials;
+import com.sakai.ecommerce.shared.application.security.AuthorizationContext;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,11 @@ public class AuthenticateHandler {
             throw new InvalidCredentials();
         }
 
-        String accessToken = tokenService.generateAccessToken(user.getId(), user.getEmail());
+        String accessToken = tokenService.generateAccessToken(
+            user.getId(),
+            user.getEmail(),
+            user.getRoles()
+        );
         String refreshToken = tokenService.generateRefreshToken(user.getId());
 
         user.updateRefreshToken(refreshToken);

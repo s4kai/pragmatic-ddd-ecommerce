@@ -23,7 +23,11 @@ public class RefreshTokenHandler {
         String sentRefreshToken = command.refreshToken();
         User user = retrieveUserAndValidateRefreshToken(sentRefreshToken);
 
-        String accessToken = tokenService.generateAccessToken(user.getId(), user.getEmail());
+        String accessToken = tokenService.generateAccessToken(
+            user.getId(),
+            user.getEmail(),
+            user.getRoles()
+        );
         String newRefreshToken = tokenService.generateRefreshToken(user.getId());
 
         user.updateRefreshToken(newRefreshToken);

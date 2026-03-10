@@ -30,15 +30,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final int BEARER_PREFIX_LENGTH = 7;
 
     private final TokenService tokenService;
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        extractToken(request)
-                .flatMap(this::authenticateToken)
-                .ifPresent(this::setAuthentication);
+        extractToken(request).ifPresent(token -> {
+            try {
+                UUID userId = tokenService.validateAccessToken(token);
+                List<String> roles = tokenService.extractRoles(token);
+                setAuthentication(userId, roles);
+            } catch (Exception ignored) {}
+        });
 
         filterChain.doFilter(request, response);
     }
@@ -49,19 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .map(header -> header.substring(BEARER_PREFIX_LENGTH));
     }
 
-    private Optional<UUID> authenticateToken(String token) {
-        try {
-            return Optional.ofNullable(tokenService.validateAccessToken(token));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
-
-    private void setAuthentication(UUID userId) {
-        List<GrantedAuthority> authorities = userRepository.findById(userId).stream()
-                .map(User::getRoles)
-                .flatMap(List::stream)
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+    private void setAuthentication(UUID userId, List<String> roles) {
+        List<GrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
 
         var authentication = new UsernamePasswordAuthenticationToken(userId, null, authorities);
